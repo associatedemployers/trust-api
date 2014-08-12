@@ -4,7 +4,7 @@ var express        = require('express'),
 module.exports = function (app) {
   var dataMapRouter = express.Router();
 
-  dataMapRouter.get('/', dataMapHandler.mapData);
+  dataMapRouter.get('/:id', dataMapHandler.mapData);
   
   app.use('/api/map-data', dataMapRouter);
 };
