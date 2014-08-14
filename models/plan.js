@@ -7,9 +7,16 @@ var mongoose =   require('mongoose'),
     momentDate = require('../utils/moment-date');
 
 var planSchema = new Schema({
-  plan: { type: Schema.Types.ObjectId, ref: 'Example' },
-  some: String,
-  time_stamp: { type: String, default: new momentDate() }
+  // From XML -> Medical Plan Key
+  name:              String,
+  legacyKey:         String,
+  legacyDescription: String,
+  ebmsIbeCode:       String,
+  ebmsIbeCode2:      String,
+  ebmsClmCode:       String,
+  legacyGrouping:    String,
+  legacyOrder:       String,
+  legacyActive:      String
 });
 
 module.exports = mongoose.model('MedicalPlan', planSchema);
