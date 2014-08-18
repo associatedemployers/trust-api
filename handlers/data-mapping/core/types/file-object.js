@@ -58,7 +58,6 @@ FileObject.prototype.fetch = function ( freshness, fileStreamer, callback ) {
       });
     });
   }
-
 }
 
 FileObject.prototype.toJSON = function ( callback ) {
