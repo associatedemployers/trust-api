@@ -19,52 +19,66 @@ var definition = {
   Active_x003F_: 'legacyActive'
 };
 
-exports.normalize = function ( hash ) {
-  for (var key in hash) {
-    // Grab the definition
-    var d = definition[ key ];
+exports.normalize = function ( hashes ) {
+  hashes.forEach(function ( hash ) {
+    for ( var key in hash ) {
+      // Grab the definition
+      var d = definition[ key ];
 
-    if( d && d !== key ) {
-      // Munge to the new key
-      hash[ d ] = hash[ key ];
-      delete hash[ key ];
-    } else if( d === key ) {
-      winston.log('warning', chalk.yellow('Key to Key map, skipping', key));
-    } else {
-      winston.log('error', chalk.bgRed('No definition found for key', key));
+      if( d && d !== key ) {
+        // Munge to the new key
+        hash[ d ] = hash[ key ];
+        delete hash[ key ];
+      } else if( d === key ) {
+        winston.log('warning', chalk.yellow('Key to Key map, skipping', key));
+      } else {
+        winston.log('error', chalk.bgRed('No definition found for key', key));
+      }
     }
-  }
+  });
 
-  return hash;
+  return hashes;
 }
 
-exports.inject = function ( hash ) {
-  Plan.find({ name: hash.name }, function ( err, record ) {
-    if( err ) {
-      winston.log('error', chalk.bgRed(err));
-      throw new Error(err);
-    }
+exports.inject = function ( hashes, callback ) {
+  var hashLen   = hashes.length,
+      fulfilled = 0,
+      plans     = [];
 
-    if( !record ) {
-
-      record = new Plan(hash);
-
-    } else {
-
-      for (var key in hash) {
-        record[key] = hash[key];
-      }
-
-    }
-
-    record.save(function ( err, plan ) {
+  hashes.forEach(function ( hash ) {
+    Plan.find({ name: hash.name }, function ( err, record ) {
       if( err ) {
         winston.log('error', chalk.bgRed(err));
         throw new Error(err);
       }
 
-      winston.info('Saved plan', plan.name);
-    });
+      if( !record ) {
 
-  })
+        record = new Plan(hash);
+
+      } else {
+
+        for (var key in hash) {
+          record[key] = hash[key];
+        }
+
+      }
+
+      record.save(function ( err, plan ) {
+        if( err ) {
+          winston.log('error', chalk.bgRed(err));
+          throw new Error(err);
+        }
+
+        winston.info('Saved plan', plan.name);
+
+        fulfilled++;
+        plans.push( plan );
+
+        if( hashLen === fulfilled ) {
+          callback( plans );
+        }
+      });
+    });
+  });
 }
