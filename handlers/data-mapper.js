@@ -5,12 +5,35 @@
 */
 
 var winston = require('winston'),
-    fs      = require('fs-extra'),
-    ftp     = require('../config/ftp'),
-    parser  = require('xml2json'),
+    chalk   = require('chalk'),
     _       = require('lodash');
 
-exports.mapData = function (req, res, next) {
+var fileManifest = require('../config/xml-file-manifest'),
+    Mapper       = require('../lib/data-mapping/core/mapper');
+
+exports.xmlToHtml = function ( req, res, next ) {
+  if(!req.params.id) {
+    return res.send('Provide a file id');
+  }
+
+  var dataMapper = new Mapper({
+    freshness: '1 day'
+  }).setupFiles( fileManifest );
+
+  dataMapper.connect(function () {
+    dataMapper.run(function ( fileObjects ) {
+      winston.log('debug', chalk.green('Drained dataMapper run queue'));
+
+      var fileObject = ( _.isArray( fileObjects ) ) ? fileObjects[ req.params.id ] : fileObjects;
+
+      res.send( 200, fileObject.renderHtml() );
+
+      dataMapper.disconnect();
+    });
+  });
+}
+
+/*exports.mapData = function (req, res, next) {
   var date = new Date(),
       timeStarted = date.getTime();
 
@@ -145,4 +168,4 @@ function buildHTML (data, callback) {
   html += '</table></body></html>';
 
   callback(html);
-}
+}*/
