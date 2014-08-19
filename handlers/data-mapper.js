@@ -16,13 +16,15 @@ exports.xmlToHtml = function ( req, res, next ) {
     freshness: '1 day'
   }).setupFiles( fileManifest );
 
+  var id = req.params.id;
+
   dataMapper.connect(function () {
     dataMapper.run(function ( fileObjects ) {
       winston.log('debug', chalk.green('Drained dataMapper run queue'));
 
-      console.log('fileObjects', fileObjects);
+      var fileObject = fileObjectGetter( id, fileObjects );
 
-      var fileObject = fileObjects[ req.params.id ];
+      winston.log('info', chalk.dim('Rendering HTML for', fileObject.type));
 
       res.send( 200, fileObject.renderHtml() );
 
@@ -41,11 +43,19 @@ exports.injectXml = function ( req, res, next ) {
     dataMapper.run(function ( fileObjects ) {
       winston.log('debug', chalk.green('Drained dataMapper run queue'));
 
-      var fileObject = ( _.isArray( fileObjects ) ) ? fileObjects[ req.params.id ] : fileObjects;
+      var fileObject = fileObjectGetter( id, fileObjects );
 
       res.send( 200, fileObject.renderHtml() );
 
       dataMapper.disconnect();
     });
   });
+}
+
+/* Private */
+
+function fileObjectGetter ( ident, fileObjects ) {
+  return ( isNaN( ident ) ) ? _.find(fileObjects, function ( file ) {
+    return file.type.toLowerCase() === ident;
+  }) : fileObjects[ ident ];
 }
