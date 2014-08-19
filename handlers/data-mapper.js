@@ -20,7 +20,9 @@ exports.xmlToHtml = function ( req, res, next ) {
     dataMapper.run(function ( fileObjects ) {
       winston.log('debug', chalk.green('Drained dataMapper run queue'));
 
-      var fileObject = ( _.isArray( fileObjects ) ) ? fileObjects[ req.params.id ] : fileObjects;
+      console.log('fileObjects', fileObjects);
+
+      var fileObject = fileObjects[ req.params.id ];
 
       res.send( 200, fileObject.renderHtml() );
 
