@@ -53,7 +53,6 @@ exports.injectXml = function ( req, res, next ) {
 }
 
 /* Private */
-
 function fileObjectGetter ( ident, fileObjects ) {
   return ( isNaN( ident ) ) ? _.find(fileObjects, function ( file ) {
     return file.type.toLowerCase() === ident;
