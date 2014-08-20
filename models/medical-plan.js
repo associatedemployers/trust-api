@@ -16,7 +16,10 @@ var planSchema = new Schema({
   ebmsClmCode:       String,
   legacyGrouping:    String,
   legacyOrder:       String,
-  legacyActive:      String
+  legacyActive:      String,
+
+  // System
+  time_stamp: { type: String, default: new momentDate() }
 });
 
 module.exports = mongoose.model('MedicalPlan', planSchema);

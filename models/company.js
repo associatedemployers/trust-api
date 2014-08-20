@@ -26,6 +26,9 @@ var companySchema = new Schema({
     zipcode: String
   },
 
+  // Relational
+  medicalRates: [{ type: mongoose.Schema.ObjectId, ref: 'MedicalRate' }],
+
   // Legacy Fields and Flags
   legacyCompanyNumber:     String,
   legacyAemMemberId:       String,

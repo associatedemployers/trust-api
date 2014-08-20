@@ -39,6 +39,8 @@ exports.injectXml = function ( req, res, next ) {
     injectAndNormalize: true
   }).setupFiles( fileManifest );
 
+  var id = req.params.id;
+
   dataMapper.connect(function () {
     dataMapper.run(function ( fileObjects ) {
       winston.log('debug', chalk.green('Drained dataMapper run queue'));
