@@ -20,5 +20,11 @@ module.exports = [
     to:      'access_medical_rates.xml',
     rootKey: 'Q_x0020_-_x0020_Medical_x002F_Office_x0020_Plans',
     type:    'medicalRates'
+  },
+  {
+    from:    'ClientDUPSok.xml',
+    to:      'employees.xml',
+    rootKey: 'ClientDUPSok',
+    type:    'employees'
   }
 ];

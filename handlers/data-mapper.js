@@ -16,7 +16,8 @@ exports.xmlToHtml = function ( req, res, next ) {
     freshness: '1 day'
   }).setupFiles( fileManifest );
 
-  var id = req.params.id;
+  var id = req.params.id,
+      limit = req.params.limit || null;
 
   dataMapper.connect(function () {
     dataMapper.run(function ( fileObjects ) {
@@ -26,7 +27,7 @@ exports.xmlToHtml = function ( req, res, next ) {
 
       winston.log('info', chalk.dim('Rendering HTML for', fileObject.type));
 
-      res.send( 200, fileObject.renderHtml() );
+      res.send( 200, fileObject.renderHtml( limit ) );
 
       dataMapper.disconnect();
     });
@@ -39,7 +40,8 @@ exports.injectXml = function ( req, res, next ) {
     injectAndNormalize: true
   }).setupFiles( fileManifest );
 
-  var id = req.params.id;
+  var id = req.params.id,
+      limit = req.params.limit || null;
 
   dataMapper.connect(function () {
     dataMapper.run(function ( fileObjects ) {
@@ -47,7 +49,30 @@ exports.injectXml = function ( req, res, next ) {
 
       var fileObject = fileObjectGetter( id, fileObjects );
 
-      res.send( 200, fileObject.renderHtml() );
+      res.send( 200, fileObject.renderHtml( limit ) );
+
+      dataMapper.disconnect();
+    });
+  });
+}
+
+exports.xmlToHtmlSingle = function ( req, res, next ) {
+  var id = req.params.id,
+      limit = req.params.limit || null;
+
+  var file = fileObjectGetter( id, fileManifest );
+
+  var dataMapper = new Mapper({
+    freshness: '1 day'
+  }).setupFiles([
+    fileManifest[ fileManifest.indexOf( file ) ]
+  ]);
+
+  dataMapper.connect(function () {
+    dataMapper.run(function ( fileObjects ) {
+      winston.log('debug', chalk.green('Drained dataMapper run queue')); 
+
+      res.send( 200, fileObjects[0].renderHtml( limit ) );
 
       dataMapper.disconnect();
     });
