@@ -32,7 +32,7 @@ exports.xmlToHtml = function ( req, res, next ) {
       dataMapper.disconnect();
     });
   });
-}
+};
 
 exports.injectXml = function ( req, res, next ) {
   var dataMapper = new Mapper({
@@ -54,7 +54,7 @@ exports.injectXml = function ( req, res, next ) {
       dataMapper.disconnect();
     });
   });
-}
+};
 
 exports.xmlToHtmlSingle = function ( req, res, next ) {
   var id = req.params.id,
@@ -77,7 +77,7 @@ exports.xmlToHtmlSingle = function ( req, res, next ) {
       dataMapper.disconnect();
     });
   });
-}
+};
 
 /* Private */
 function fileObjectGetter ( ident, fileObjects ) {
