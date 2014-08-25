@@ -28,6 +28,7 @@ var companySchema = new Schema({
 
   // Relational
   medicalRates: [{ type: mongoose.Schema.ObjectId, ref: 'MedicalRate' }],
+  employees:    [{ type: mongoose.Schema.ObjectId, ref: 'Employee' }],
 
   // Legacy Fields and Flags
   legacyCompanyNumber:     String,

@@ -56,6 +56,37 @@ exports.injectXml = function ( req, res, next ) {
   });
 };
 
+exports.injectSingle = function ( req, res, next ) {
+  var date = new Date(),
+      timeStarted = date.getTime();
+
+  var id = req.params.id,
+      limit = req.params.limit || null;
+
+  var file = fileObjectGetter( id, fileManifest );
+
+  var dataMapper = new Mapper({
+    freshness: '1 day',
+    injectAndNormalize: true
+  }).setupFiles([
+    fileManifest[ fileManifest.indexOf( file ) ]
+  ]);
+
+  dataMapper.connect(function () {
+    dataMapper.run(function ( fileObjects ) {
+      winston.log('debug', chalk.green('Drained dataMapper run queue'));
+
+      var date = new Date(),
+          timeEnded = date.getTime();
+
+      res.set('Time-On-Server', (( timeStarted - timeEnded ) / 1000).toString() + ' seconds');
+      res.send( 200, fileObjects[0].renderHtml( limit ) );
+
+      dataMapper.disconnect();
+    });
+  });
+};
+
 exports.xmlToHtmlSingle = function ( req, res, next ) {
   var id = req.params.id,
       limit = req.params.limit || null;

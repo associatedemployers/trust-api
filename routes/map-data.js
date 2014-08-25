@@ -7,6 +7,7 @@ module.exports = function (app) {
   dataMapRouter.get('/:id/html/:limit', dataMapHandler.xmlToHtml);
   dataMapRouter.get('/:id/injectAndHtml/:limit', dataMapHandler.injectXml);
 
+  dataMapRouter.get('/:id/injectSingle/:limit', dataMapHandler.injectSingle);
   dataMapRouter.get('/:id/htmlSingle/:limit', dataMapHandler.xmlToHtmlSingle);
   
   app.use('/api/map-data', dataMapRouter);
