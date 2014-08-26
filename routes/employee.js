@@ -13,5 +13,5 @@ module.exports = function (app) {
 
   employeeRouter.delete('/:id', employeeHandler.del);
   
-  app.use('/api/employee', employeeRouter);
+  app.use('/api/employees', employeeRouter);
 };

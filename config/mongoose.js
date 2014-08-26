@@ -8,5 +8,5 @@ var mongoose = require('mongoose'),
 
 exports.init = function () {
   winston.info('Connecting to mongodb...');
-  mongoose.connect('localhost', 'trust');
-}
+  return mongoose.connect('localhost', 'trust');
+};

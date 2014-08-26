@@ -4,8 +4,16 @@
   Map & munge data
 */
 
-exports.example = function (ex) {
-  return {
-    examplekey: ex
-  };
+exports.employee = function ( employee ) {
+  return prefixType( 'employee', employee );
+};
+
+/* Private */
+
+function prefixType (type, data) {
+  var o = {};
+
+  o[type] = data;
+
+  return o;
 }
