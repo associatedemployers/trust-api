@@ -3,8 +3,8 @@ var winston   = require('winston'),
     normalize = require('../config/data-normalization'),
     respond   = require('./response');
 
-var Employee = require('../models/employee');
-var Company  = require('../models/company');
+var Employee    = require('../models/employee');
+var Company     = require('../models/company');
 var MedicalRate = require('../models/medical-rate');
 
 exports.fetchAll = function ( req, res, next ) {
@@ -15,9 +15,10 @@ exports.fetchAll = function ( req, res, next ) {
 
   delete query.limit;
   delete query.page;
+
   console.log(query, limit, page, skip);
 
-  Employee.find( query ).skip( skip ).limit( limit ).exec(function ( err, records ) {
+  Employee.find( query ).skip( Math.abs(skip) ).limit( Math.abs(limit) ).exec(function ( err, records ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
