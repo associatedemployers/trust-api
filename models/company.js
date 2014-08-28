@@ -4,7 +4,7 @@
 
 var mongoose =   require('mongoose'),
     Schema =     mongoose.Schema,
-    momentDate = require('../utils/moment-date');
+    momentDate = require('../lib/utilities/moment-date');
 
 var companySchema = new Schema({
   // From XML -> Companies
@@ -58,7 +58,7 @@ var companySchema = new Schema({
   legacyNumberEmployees:   String,
 
   // System
-  time_stamp: { type: String, default: new momentDate() }
+  time_stamp: { type: String, default: momentDate() }
 });
 
 module.exports = mongoose.model('Company', companySchema);

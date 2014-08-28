@@ -4,7 +4,7 @@
 
 var mongoose =   require('mongoose'),
     Schema =     mongoose.Schema,
-    momentDate = require('../utils/moment-date');
+    momentDate = require('../lib/utilities/moment-date');
 
 var rateSchema = new Schema({
   // From XML -> MedicalRate
@@ -26,7 +26,7 @@ var rateSchema = new Schema({
   company: { type: mongoose.Schema.ObjectId, ref: 'Company' },
 
   // System
-  time_stamp: { type: String, default: new momentDate() }
+  time_stamp: { type: String, default: momentDate() }
 });
 
 module.exports = mongoose.model('MedicalRate', rateSchema);

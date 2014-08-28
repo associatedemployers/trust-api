@@ -4,7 +4,7 @@
 
 var mongoose =   require('mongoose'),
     Schema =     mongoose.Schema,
-    momentDate = require('../utils/moment-date');
+    momentDate = require('../lib/utilities/moment-date');
 
 /*
   Subdoc Schemas
@@ -94,7 +94,7 @@ var employeeSchema = new Schema({
   company: { type: mongoose.Schema.ObjectId, ref: 'Company' },
 
   // System DTs
-  legacyClientEmployementDate: String,
+  legacyClientEmploymentDate:  String,
   legacyClientTerminationDate: String,
   legacyInitialDateSent:       String,
   legacyChangeSent:            String,
@@ -103,7 +103,7 @@ var employeeSchema = new Schema({
   legacyCobraStartDate:        String,
   legacyCobraTerminationDate:  String,
 
-  time_stamp: { type: String, default: new momentDate() }
+  time_stamp: { type: String, default: momentDate() }
 });
 
 module.exports = mongoose.model('Employee', employeeSchema);
