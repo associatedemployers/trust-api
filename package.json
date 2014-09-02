@@ -4,7 +4,7 @@
   "description": "Trust API Server",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test spec -r"
+    "test": "mocha test -r spec"
   },
   "repository": "https://github.com/trust-enrollment/trust-api",
   "engines": {
