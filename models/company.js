@@ -58,7 +58,7 @@ var companySchema = new Schema({
   legacyNumberEmployees:   String,
 
   // System
-  time_stamp: { type: String, default: momentDate() }
+  time_stamp: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Company', companySchema);

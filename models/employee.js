@@ -103,7 +103,7 @@ var employeeSchema = new Schema({
   legacyCobraStartDate:        String,
   legacyCobraTerminationDate:  String,
 
-  time_stamp: { type: String, default: momentDate() }
+  time_stamp: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Employee', employeeSchema);

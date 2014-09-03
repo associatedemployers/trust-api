@@ -19,7 +19,7 @@ var planSchema = new Schema({
   legacyActive:      String,
 
   // System
-  time_stamp: { type: String, default: momentDate() }
+  time_stamp: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('MedicalPlan', planSchema);

@@ -26,7 +26,7 @@ var rateSchema = new Schema({
   company: { type: mongoose.Schema.ObjectId, ref: 'Company' },
 
   // System
-  time_stamp: { type: String, default: momentDate() }
+  time_stamp: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('MedicalRate', rateSchema);
