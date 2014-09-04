@@ -2,9 +2,8 @@
   Medical Rate - Server Data Model
 */
 
-var mongoose =   require('mongoose'),
-    Schema =     mongoose.Schema,
-    momentDate = require('../lib/utilities/moment-date');
+var mongoose = require('mongoose'),
+    Schema   = mongoose.Schema;
 
 /*
   Subdoc Schemas

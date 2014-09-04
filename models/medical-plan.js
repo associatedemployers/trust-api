@@ -2,8 +2,8 @@
   Medical Plan - Server Data Model
 */
 
-var mongoose =   require('mongoose'),
-    Schema =     mongoose.Schema,
+var mongoose   = require('mongoose'),
+    Schema     = mongoose.Schema,
     momentDate = require('../lib/utilities/moment-date');
 
 var planSchema = new Schema({
