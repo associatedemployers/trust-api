@@ -8,7 +8,6 @@ var mongoose =   require('mongoose'),
 
 var rateSchema = new Schema({
   // From XML -> MedicalRate
-  legacyCompanyNumber: String,
   ebmsNumber:          String,
   planNumber:          String,
   legacyNetwork:       String,
@@ -21,6 +20,15 @@ var rateSchema = new Schema({
   employeeAndSpouse:   Number,
   employeeAndChildren: Number,
   family:              Number,
+
+  legacyOldEmployeeRate:                   String,
+  legacyOldEmployeeAndSpouseRate:          String,
+  legacyOldEmployeeAndChildrenRate:        String,
+  legacyOldFamilyRate:                     String,
+  legacyRateChangeEmployeeRate:            String,
+  legacyRateChangeEmployeeAndSpouseRate:   String,
+  legacyRateChangeEmployeeAndChildrenRate: String,
+  legacyRateChangeFamilyRate:              String,
 
   // Relational
   company: { type: mongoose.Schema.ObjectId, ref: 'Company' },

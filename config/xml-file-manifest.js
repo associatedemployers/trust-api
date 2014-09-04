@@ -5,20 +5,32 @@
 module.exports = [
   {
     from:    'Medical Key.xml',
-    to:      'medical_plan_key.xml',
+    to:      'medical-plan-key.xml',
     rootKey: 'Medical_x0020_Key',
     type:    'medicalPlanKey'
   },
   {
-    from:    'Q - Active Companies for xml upload.xml',
-    to:      'access_companies.xml',
-    rootKey: 'Q_x0020_-_x0020_Active_x0020_Companies_x0020_for_x0020_xml_x0020_upload',
+    from:    'Contact.xml',
+    to:      'access-companies.xml',
+    rootKey: 'Contact',
     type:    'companies'
   },
   {
-    from:    'Q - Medical_Office Plans.xml',
-    to:      'access_medical_rates.xml',
-    rootKey: 'Q_x0020_-_x0020_Medical_x002F_Office_x0020_Plans',
+    from:    'Office.xml',
+    to:      'access-company-locations.xml',
+    rootKey: 'Office',
+    type:    'location'
+  },
+  {
+    from:    'OfficePlans.xml',
+    to:      'access-legacy-company-plans',
+    rootKey: 'OfficePlans',
+    type:    'companyPlans'
+  },
+  {
+    from:    'MedicalRates.xml',
+    to:      'access-medical-rates.xml',
+    rootKey: 'MedicalRates',
     type:    'medicalRates'
   },
   {
