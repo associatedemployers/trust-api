@@ -28,14 +28,13 @@ var companySchema = new Schema({
   // Relational
   medicalRates: [{ type: mongoose.Schema.ObjectId, ref: 'MedicalRate' }],
   employees:    [{ type: mongoose.Schema.ObjectId, ref: 'Employee' }],
+  locations:    [{ type: mongoose.Schema.ObjectId, ref: 'Location' }],
 
   // Legacy Fields and Flags
   legacyCompanyNumber:     String,
   legacyAemMemberId:       String,
   legacyBrokerId:          String,
   legacyRateTier:          String,
-  legacyCompEffectDate:    String,
-  legacyBrokerEffectDate:  String,
   legacyWaitingPeriod:     String,
   legacySelectCare:        String,
   legacyMinimumHours:      String,
@@ -55,6 +54,9 @@ var companySchema = new Schema({
   legacyEffectiveMonth:    String,
   legacyPrimaryCo:         String,
   legacyNumberEmployees:   String,
+
+  legacyCompEffectDate:   Date,
+  legacyBrokerEffectDate: Date,
 
   // System
   time_stamp: { type: Date, default: Date.now }

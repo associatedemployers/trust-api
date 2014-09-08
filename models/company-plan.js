@@ -1,7 +1,7 @@
 /*
   Company - Server Data Model
   ---
-  Temporary!
+  Temporary for xml injection!
 */
 
 var mongoose = require('mongoose'),

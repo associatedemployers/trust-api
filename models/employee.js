@@ -93,14 +93,14 @@ var employeeSchema = new Schema({
   company: { type: mongoose.Schema.ObjectId, ref: 'Company' },
 
   // System DTs
-  legacyClientEmploymentDate:  String,
-  legacyClientTerminationDate: String,
-  legacyInitialDateSent:       String,
-  legacyChangeSent:            String,
-  legacyTerminationSent:       String,
-  legacyTrapTermination:       String,
-  legacyCobraStartDate:        String,
-  legacyCobraTerminationDate:  String,
+  legacyClientEmploymentDate:  Date,
+  legacyClientTerminationDate: Date,
+  legacyInitialDateSent:       Date,
+  legacyChangeSent:            Date,
+  legacyTerminationSent:       Date,
+  legacyTrapTermination:       Date,
+  legacyCobraStartDate:        Date,
+  legacyCobraTerminationDate:  Date,
 
   time_stamp: { type: Date, default: Date.now }
 });
