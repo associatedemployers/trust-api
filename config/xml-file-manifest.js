@@ -34,6 +34,12 @@ module.exports = [
     type:    'medicalRates'
   },
   {
+    from:    'DentalRates.xml',
+    to:      'access-dental-rates.xml',
+    rootKey: 'DentalRates',
+    type:    'dentalRates'
+  },
+  {
     from:    'ClientDUPSok.xml',
     to:      'employees.xml',
     rootKey: 'ClientDUPSok',

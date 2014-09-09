@@ -1,19 +1,20 @@
 /*
   Medical Rate - Server Data Model
+  ---
+  -Should be polymorphic-
 */
 
-var mongoose =   require('mongoose'),
-    Schema =     mongoose.Schema,
-    momentDate = require('../lib/utilities/moment-date');
+var mongoose = require('mongoose'),
+    Schema   = mongoose.Schema;
 
 var rateSchema = new Schema({
   // From XML -> MedicalRate
-  ebmsNumber:          String,
-  planNumber:          String,
-  legacyNetwork:       String,
-  coInsurance:         String,
-  deductible:          String,
-  legacyDescription:   String,
+  ebmsNumber:    String,
+  planNumber:    String,
+  legacyNetwork: String,
+  coInsurance:   String,
+  deductible:    String,
+  name:          String,
 
   // Actual Rates
   employee:            Number,
