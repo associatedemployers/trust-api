@@ -46,6 +46,12 @@ module.exports = [
     type:    'visionRates'
   },
   {
+    from:    'LifeInsuranceRates.xml',
+    to:      'access-life-rates.xml',
+    rootKey: 'LifeInsuranceRates',
+    type:    'lifeRates'
+  },
+  {
     from:    'ClientDUPSok.xml',
     to:      'employees.xml',
     rootKey: 'ClientDUPSok',
