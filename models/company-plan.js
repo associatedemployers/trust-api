@@ -13,6 +13,8 @@ var companyPlanSchema = new Schema({
   legacyPlanType:    String,
   legacyDescription: String,
   legacyNetwork:     String,
+
+  company: { type: mongoose.Schema.ObjectId, ref: 'Company' }
 });
 
 module.exports = mongoose.model('CompanyPlan', companyPlanSchema);
