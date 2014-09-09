@@ -40,6 +40,12 @@ module.exports = [
     type:    'dentalRates'
   },
   {
+    from:    'VisionRates.xml',
+    to:      'access-vision-rates.xml',
+    rootKey: 'VisionRates',
+    type:    'visionRates'
+  },
+  {
     from:    'ClientDUPSok.xml',
     to:      'employees.xml',
     rootKey: 'ClientDUPSok',

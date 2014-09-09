@@ -28,6 +28,7 @@ var companySchema = new Schema({
   // Relational
   medicalRates: [{ type: mongoose.Schema.ObjectId, ref: 'MedicalRate' }],
   dentalRates:  [{ type: mongoose.Schema.ObjectId, ref: 'DentalRate' }],
+  visionRates:  [{ type: mongoose.Schema.ObjectId, ref: 'VisionRate' }],
   employees:    [{ type: mongoose.Schema.ObjectId, ref: 'Employee' }],
   locations:    [{ type: mongoose.Schema.ObjectId, ref: 'Location' }],
 

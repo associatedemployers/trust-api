@@ -1,5 +1,5 @@
 /*
-  Dental Rate - Server Data Model
+  Vision Rate - Server Data Model
   ---
   -Should be polymorphic-
 */
@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
 var rateSchema = new Schema({
-  // From XML -> DentalRate
+  // From XML -> VisionRate
   deductible:          String,
 
   // Actual Rates
@@ -24,4 +24,4 @@ var rateSchema = new Schema({
   time_stamp: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('DentalRate', rateSchema);
+module.exports = mongoose.model('VisionRate', rateSchema);
