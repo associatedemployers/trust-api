@@ -90,7 +90,8 @@ var employeeSchema = new Schema({
   },
 
   // Relational
-  company: { type: mongoose.Schema.ObjectId, ref: 'Company' },
+  company:  { type: mongoose.Schema.ObjectId, ref: 'Company' },
+  location: { type: mongoose.Schema.ObjectId, ref: 'Location' }, // Track Employee Location
 
   // System DTs
   legacyClientEmploymentDate:  Date,
