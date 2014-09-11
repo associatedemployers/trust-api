@@ -7,6 +7,8 @@ var express = require('express'),
 
 var port = process.env.PORT || 3000;
 
+process.title = 'Trust API - Node.js';
+
 app.listen(port, function () {
   winston.info('Server listening on port', port, '...');
 });
