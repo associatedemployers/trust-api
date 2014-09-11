@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
 var companyPlanSchema = new Schema({
-  legacyEbmsNumber:  String,
+  legacyEbmsNumber:  Number,
   legacyPlanNumber:  String,
   legacyPlanType:    String,
   legacyDescription: String,
