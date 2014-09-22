@@ -11,6 +11,10 @@ var winston = require('winston'),
 var fileManifest = require('../config/xml-file-manifest'),
     Mapper       = require('../lib/data-mapping/core/mapper');
 
+var fileTypes = fileManifest.map(function ( o ) {
+  return o.type.toLowerCase();
+});
+
 exports.xmlToHtml = function ( req, res, next ) {
   var dataMapper = new Mapper({
     freshness: '1 day'
@@ -21,9 +25,13 @@ exports.xmlToHtml = function ( req, res, next ) {
 
   dataMapper.connect(function () {
     dataMapper.run(function ( fileObjects ) {
-      winston.log('debug', chalk.green('Drained dataMapper run queue'));
+      winston.log('info', chalk.green('Drained dataMapper run queue'));
 
       var fileObject = fileObjectGetter( id, fileObjects );
+
+      if( !fileObject ) {
+        return res.send(id + ' is not manifested in xml. Here is a list of manifested xml objects:<br /><br />' + fileTypes.join('<br />'));
+      }
 
       winston.log('info', chalk.dim('Rendering HTML for', fileObject.type));
 
@@ -48,6 +56,10 @@ exports.injectXml = function ( req, res, next ) {
       winston.log('debug', chalk.green('Drained dataMapper run queue'));
 
       var fileObject = fileObjectGetter( id, fileObjects );
+
+      if( !fileObject ) {
+        return res.send(id + ' is not manifested in xml. Here is a list of manifested xml objects:<br /><br />' + fileTypes.join('<br />'));
+      }
 
       res.send( 200, fileObject.renderHtml( limit ) );
 
@@ -92,6 +104,10 @@ exports.xmlToHtmlSingle = function ( req, res, next ) {
       limit = req.params.limit || null;
 
   var file = fileObjectGetter( id, fileManifest );
+
+  if( !file ) {
+    return res.send(id + ' is not manifested in xml. Here is a list of manifested xml objects:<br /><br />' + fileTypes.join('<br />'));
+  }
 
   var dataMapper = new Mapper({
     freshness: '1 day'

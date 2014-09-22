@@ -53,8 +53,14 @@ module.exports = [
   },
   {
     from:    'ClientDUPSok.xml',
-    to:      'employees.xml',
+    to:      'access-employees.xml',
     rootKey: 'ClientDUPSok',
     type:    'employees'
+  },
+  {
+    from:    'History Individual.xml',
+    to:      'access-employee-current.xml',
+    rootKey: 'History_x0020_Individual',
+    type:    'employeeHistory'
   }
 ];
