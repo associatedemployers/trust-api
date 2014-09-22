@@ -21,7 +21,7 @@ The module adds these critical features to the system:
 + **Per Change**
   + Notes!
   + Flags! ( Like `Mistake` )
-+ **Systematic Calucations (BL)**
++ **Systematic Calculations (BL)**
   + Effective Date
   + **FUTURE:**
     + Adjustment Calculation
