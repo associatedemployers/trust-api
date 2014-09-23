@@ -106,4 +106,7 @@ var employeeSchema = new Schema({
   time_stamp: { type: Date, default: Date.now }
 });
 
+// Attach some mongoose hooks
+employeeSchema = require(process.cwd() + '/lib/ticker/core').attach( employeeSchema );
+
 module.exports = mongoose.model('Employee', employeeSchema);
