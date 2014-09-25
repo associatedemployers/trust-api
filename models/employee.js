@@ -107,6 +107,6 @@ var employeeSchema = new Schema({
 });
 
 // Attach some mongoose hooks
-employeeSchema = require(process.cwd() + '/lib/ticker/core').attach( employeeSchema );
+employeeSchema = require(process.cwd() + '/lib/ticker/ticker').attach( employeeSchema );
 
 module.exports = mongoose.model('Employee', employeeSchema);
