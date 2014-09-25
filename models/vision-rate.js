@@ -10,6 +10,8 @@ var mongoose = require('mongoose'),
 var rateSchema = new Schema({
   // From XML -> VisionRate
   deductible:          String,
+  planNumber:          String,
+  name:                String,
 
   // Actual Rates
   employee:            Number,
