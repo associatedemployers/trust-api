@@ -17,8 +17,12 @@ var rateSchema = new Schema({
 
   ageGroup: {
     start: Number,
-    end: Number
+    end:   Number
   },
+
+  coversSpouse:     { type: Boolean, default: false },
+  coversEmployee:   { type: Boolean, default: false },
+  coversDependents: { type: Boolean, default: false },
 
   // Relational
   companies: [{ type: mongoose.Schema.ObjectId, ref: 'Company' }],

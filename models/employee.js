@@ -93,6 +93,21 @@ var employeeSchema = new Schema({
   company:  { type: mongoose.Schema.ObjectId, ref: 'Company' },
   location: { type: mongoose.Schema.ObjectId, ref: 'Location' }, // Track Employee Location
 
+  // Plans
+  //
+  // Rationale for arrays of objects containing plan refs:
+  // 1) Multiple enrolled plans per employee
+  // 2) ---> Options per plan
+  // 3) Brevity :D
+  // 
+  // Populate these paths normally like .populate('plans.medical.plan')
+  plans: {
+    medical: [{ plan: { type: Schema.ObjectId, ref: 'MedicalRate' }, covering: String }],
+    dental:  [{ plan: { type: Schema.ObjectId, ref: 'DentalRate' },  covering: String }],
+    vision:  [{ plan: { type: Schema.ObjectId, ref: 'VisionRate' },  covering: String }],
+    life:    [{ plan: { type: Schema.ObjectId, ref: 'LifeRate' },    covering: String }]
+  },
+
   // System DTs
   legacyClientEmploymentDate:  Date,
   legacyClientTerminationDate: Date,
