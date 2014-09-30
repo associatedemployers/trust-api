@@ -7,11 +7,29 @@ var mongoose = require('mongoose'),
 
 var connection;
 
-exports.init = function () {
-  if( !connection ) {
-    winston.info('Connecting to mongodb...');
-    connection = mongoose.connect('localhost', 'trust');
-  }
+exports.init = function ( db, address, singleton ) {
+  // Defaults
+  db      = db      || 'trust';
+  address = address || 'localhost';
 
-  return connection;
+  if( !connection && !singleton ) {
+    mongoose.connection.close();
+
+    winston.info('Connecting to', db, 'db...');
+
+    connection = mongoose.connect(address, db);
+
+    return connection;
+
+  } else if( singleton ) {
+
+    winston.info('Singleton connection to', db, 'db...');
+
+    return mongoose.connect(address, db);
+
+  } else {
+
+    return connection;
+
+  }
 };
