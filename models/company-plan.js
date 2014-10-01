@@ -7,6 +7,8 @@
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
+var createModel = require('./helpers/create-model');
+
 var companyPlanSchema = new Schema({
   legacyEbmsNumber:  String,
   legacyPlanNumber:  String,
@@ -17,4 +19,4 @@ var companyPlanSchema = new Schema({
   company: { type: mongoose.Schema.ObjectId, ref: 'Company' }
 });
 
-module.exports = mongoose.model('CompanyPlan', companyPlanSchema);
+module.exports = createModel('CompanyPlan', companyPlanSchema);

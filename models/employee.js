@@ -5,6 +5,8 @@
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
+var createModel = require('./helpers/create-model');
+
 /*
   Subdoc Schemas
 */
@@ -124,4 +126,4 @@ var employeeSchema = new Schema({
 // Attach some mongoose hooks
 employeeSchema = require(process.cwd() + '/lib/ticker/ticker').attach( employeeSchema );
 
-module.exports = mongoose.model('Employee', employeeSchema);
+module.exports = createModel('Employee', employeeSchema);

@@ -6,6 +6,8 @@ var mongoose   = require('mongoose'),
     Schema     = mongoose.Schema,
     momentDate = require('../lib/utilities/moment-date');
 
+var createModel = require('./helpers/create-model');
+
 var planSchema = new Schema({
   // From XML -> Medical Plan Key
   name:              String,
@@ -22,4 +24,4 @@ var planSchema = new Schema({
   time_stamp: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('MedicalPlan', planSchema);
+module.exports = createModel('MedicalPlan', planSchema);

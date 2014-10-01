@@ -5,6 +5,8 @@
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
+var createModel = require('./helpers/create-model');
+
 var historyEventSchema = new Schema({
   description:  String,           // Calculated in Ticker.tick
   eventFlags:   [ String ],       // Array of Flag Strings, visual
@@ -25,4 +27,4 @@ var historyEventSchema = new Schema({
   time_stamp: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('HistoryEvent', historyEventSchema);
+module.exports = createModel('HistoryEvent', historyEventSchema);

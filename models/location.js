@@ -7,6 +7,8 @@
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
+var createModel = require('./helpers/create-model');
+
 var locationSchema = new Schema({
   ebmsNumber:          String,
   legacyCompanyNumber: String,
@@ -35,4 +37,4 @@ var locationSchema = new Schema({
   time_stamp:          String,
 });
 
-module.exports = mongoose.model('Location', locationSchema);
+module.exports = createModel('Location', locationSchema);

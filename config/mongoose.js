@@ -25,9 +25,11 @@ exports.init = function ( db, address, singleton ) {
 
     winston.info('Singleton connection to', db, 'db...');
 
-    return mongoose.connect(address, db);
+    return mongoose.createConnection(address + '/' + db);
 
   } else {
+
+    winston.info('returning existing connection');
 
     return connection;
 

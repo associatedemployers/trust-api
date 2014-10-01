@@ -7,6 +7,8 @@
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
+var createModel = require('./helpers/create-model');
+
 var rateSchema = new Schema({
   // From XML -> DentalRate
   deductible:          String,
@@ -26,4 +28,4 @@ var rateSchema = new Schema({
   time_stamp: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('DentalRate', rateSchema);
+module.exports = createModel('DentalRate', rateSchema);

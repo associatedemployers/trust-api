@@ -5,6 +5,8 @@
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
+var createModel = require('./helpers/create-model');
+
 var companySchema = new Schema({
   // From XML -> Companies
   name: {
@@ -64,4 +66,4 @@ var companySchema = new Schema({
   time_stamp: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Company', companySchema);
+module.exports = createModel('Company', companySchema);
