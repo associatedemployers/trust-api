@@ -1,3 +1,6 @@
+var tickerCalcThres = 100,  // Calculation threshold in milliseconds
+    tickerCalcOps   = 1000; // Operations to run in calc time test
+
 var cwd = process.cwd(),
     configDir    = cwd + '/config/',
     tickerDir    = cwd + '/lib/ticker/',
@@ -8,7 +11,9 @@ var cwd = process.cwd(),
 var chai        = require('chai'),
     chaiPromise = require('chai-as-promised'),
     expect      = chai.expect,
-    _           = require('lodash');
+    _           = require('lodash'),
+    async       = require('async'),
+    chalk       = require('chalk');
 
 chai.use( chaiPromise );
 
@@ -82,7 +87,7 @@ describe('Ticker Core', function () {
     });
   });
 
-  describe('Ticker.tick - acceptance race tests', function () {
+  describe('Ticker.tick', function () {
 
     describe('Prelim Checking', function () {
 
@@ -179,8 +184,73 @@ describe('Ticker Core', function () {
                 throw err;
               }
 
-              // Race to create historyEvent in a reasonable amount of time
-              setTimeout(function () {
+              testModel.findById(doc._id).populate('historyEvents').exec(function ( err, doc ) {
+                if( err ) {
+                  throw err;
+                }
+
+                expect(doc, 'document').to.exist; // jshint ignore:line
+                expect(doc.historyEvents, 'doc[historyEvents]').to.be.an('array').and.to.have.length(1);
+
+                var mungedDoc = doc.toObject(),
+                    historyEv = doc.historyEvents[0];
+
+                delete mungedDoc.historyEvents;
+                delete mungedDoc.__v;
+                delete doc.historyEvents[0].documents.updated.__v;
+
+                expect(historyEv, 'doc[historyEvents][0]').to.have.property('time_stamp');
+                expect(historyEv.documents.updated).to.deep.equal(mungedDoc);
+                expect(historyEv.deltaTypes).to.have.members(['Deleted', 'Changed']);
+
+                done();
+              });
+            });
+          });
+        });
+        
+        it('shouldn\'t pass test calc. time threshold ( ' + tickerCalcThres + 'ms race )', function ( done ) {
+          this.timeout( tickerCalcThres * 1000 ); // 1000 ops
+
+          var _schema   = _ticker.attach( _model ),
+              testModel = createModel('TestThres', _schema),
+              models    = [],
+              calcs     = [];
+
+          for ( var i = 0; i < tickerCalcOps; i++ ) {
+            models.push(new testModel({
+              name: {
+                first: 'i',
+                last:  'sure'
+              },
+              email: 'hope@its.com',
+              tags: [ 'fast' ]
+            }));
+          }
+
+          // Perform a series of async ops to determine calc time
+          async.mapSeries(models, function ( testRecord, next ) {
+            testRecord.save(function ( err, doc ) {
+              if( err ) {
+                throw err;
+              }
+
+              expect(doc, 'document').to.exist; // jshint ignore:line
+              doc.name.first = 'I';
+              doc.email      = undefined;
+              doc.tags.push('really');
+
+              var sTime = new Date();
+
+              doc.save(function ( err, doc ) {
+                if( err ) {
+                  throw err;
+                }
+
+                var eTime = new Date();
+
+                calcs.push( eTime.getTime() - sTime.getTime() )
+
                 testModel.findById(doc._id).populate('historyEvents').exec(function ( err, doc ) {
                   if( err ) {
                     throw err;
@@ -200,13 +270,19 @@ describe('Ticker Core', function () {
                   expect(historyEv.documents.updated).to.deep.equal(mungedDoc);
                   expect(historyEv.deltaTypes).to.have.members(['Deleted', 'Changed']);
 
-                  done();
+                  next();
                 });
-              }, 2000);
+              });
             });
+          }, function () {
+            var calcTime = calcs.reduce(function ( a, b ) {
+              return a + b;
+            }) / calcs.length;
+
+            console.log(chalk.green('          ' + calcTime + 'ms'), chalk.dim('average Ticker.tick auto calculation time over 1000 records'));
+            done();
           });
         });
-
       });
     });
 
