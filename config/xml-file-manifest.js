@@ -58,9 +58,9 @@ module.exports = [
     type:    'employees'
   },
   {
-    from:    'History Individual.xml',
+    from:    'History Individual File.xml',
     to:      'access-employee-current.xml',
-    rootKey: 'History_x0020_Individual',
+    rootKey: 'History_x0020_Individual_x0020_File',
     type:    'employeeHistory'
   }
 ];

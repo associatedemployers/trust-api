@@ -36,7 +36,6 @@ var employeeSchema = new Schema({
   // From XML -> Employee
   // Legacy
   legacyRecordNumber:              String,
-  legacyUniqueId:                  String,
   legacyCobraTermChoice:           String,
   legacyPreExistingCondition:      String,
   legacyCreditableCoverage:        String,
@@ -58,6 +57,7 @@ var employeeSchema = new Schema({
   legacyXVolVisionWaivedDependentName: String,
 
   ebmsNumber:          String,
+  memberId:            String, // 943 #
   ebmsTerminationCode: String,
   waived:              Boolean,
 
