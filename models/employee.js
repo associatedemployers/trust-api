@@ -1,5 +1,5 @@
 /*
-  Medical Rate - Server Data Model
+  Employee - Server Data Model
 */
 
 var mongoose = require('mongoose'),
@@ -85,15 +85,12 @@ var employeeSchema = new Schema({
   gender:        String,
   maritalStatus: String,
 
-  dateOfBirth: {
-    year:  Number,
-    month: Number,
-    day:   Number
-  },
+  dateOfBirth: Date,
 
   // Relational
-  company:  { type: mongoose.Schema.ObjectId, ref: 'Company' },
-  location: { type: mongoose.Schema.ObjectId, ref: 'Location' }, // Track Employee Location
+  company:    { type: mongoose.Schema.ObjectId, ref: 'Company' },
+  location:   { type: mongoose.Schema.ObjectId, ref: 'Location' },  // Track Employee Location
+  dependents: [{ type: mongoose.Schema.ObjectId, ref: 'Dependent' }],
 
   // Plans
   //

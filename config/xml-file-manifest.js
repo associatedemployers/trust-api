@@ -62,5 +62,11 @@ module.exports = [
     to:      'access-employee-current.xml',
     rootKey: 'History_x0020_Individual_x0020_File',
     type:    'employeeHistory'
+  },
+  {
+    from:    'Dependents File.xml',
+    to:      'access-dependents.xml',
+    rootKey: 'Dependents_x0020_File',
+    type:    'dependents'
   }
 ];
