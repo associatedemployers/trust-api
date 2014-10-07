@@ -117,7 +117,7 @@ var employeeSchema = new Schema({
   legacyCobraStartDate:        Date,
   legacyCobraTerminationDate:  Date,
 
-  time_stamp: { type: Date, default: Date.now }
+  time_stamp: { type: Date, default: Date.now, index: true }
 });
 
 // Attach some mongoose hooks
