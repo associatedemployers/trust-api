@@ -11,18 +11,21 @@ var createModel = require('./helpers/create-model');
   Subdoc Schemas
 */
 var contactSchema = new Schema({
+  _id:   { type: Schema.Types.ObjectId, default: Schema.Types.ObjectId },
   type:  String, // home, work, mobile, email
   value: String, // example@example.com
   ext:   String  // 124
 });
 
 var noteSchema = new Schema({
+  _id:    { type: Schema.Types.ObjectId, default: Schema.Types.ObjectId },
   ebms:   Boolean, // Upload this note to EBMS?
   concat: Boolean, // Concatenate this note in an export to EBMS or access?
   text:   String   // Text of the note
 });
 
 var beneficiarySchema = new Schema({
+  _id:      { type: Schema.Types.ObjectId, default: Schema.Types.ObjectId },
   type:     String, // primary or contingent
   name:     String, // John Doe
   relation: String, // Brother

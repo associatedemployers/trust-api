@@ -12,6 +12,10 @@ exports.company = function ( company, meta ) {
   return prefixType( 'company', company, meta );
 };
 
+exports.historyEvent = function ( historyEvent, meta ) {
+  return prefixType( 'historyEvent', historyEvent, meta );
+};
+
 /* Private */
 function prefixType ( type, data, meta ) {
   var o = {};
