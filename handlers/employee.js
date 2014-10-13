@@ -15,6 +15,14 @@ exports.fetchAll = function ( req, res, next ) {
       skip  = page * limit,
       sort  = query.sort || { time_stamp: 1 };
 
+  if( req.query.ids ) {
+    query._id = {
+      $in: req.query.ids
+    };
+
+    delete query.ids;
+  }
+
   delete query.limit;
   delete query.page;
   delete query.sort;

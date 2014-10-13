@@ -11,6 +11,14 @@ exports.fetchAll = function ( req, res, next ) {
       page  = parseFloat(query.page)  || 0,
       skip  = page * limit;
 
+  if( req.query.ids ) {
+    query._id = {
+      $in: req.query.ids
+    };
+
+    delete query.ids;
+  }
+
   delete query.limit;
   delete query.page;
 
