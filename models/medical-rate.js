@@ -35,6 +35,7 @@ var rateSchema = new Schema({
 
   // Relational
   company: { type: mongoose.Schema.ObjectId, ref: 'Company' },
+  plan:    { type: mongoose.Schema.ObjectId, ref: 'MedicalPlan' },
 
   // System
   time_stamp: { type: Date, default: Date.now }
