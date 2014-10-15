@@ -1,7 +1,5 @@
 /*
   Life Rate - Server Data Model
-  ---
-  -Should be polymorphic-
 */
 
 var mongoose = require('mongoose'),
