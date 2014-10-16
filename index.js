@@ -7,7 +7,7 @@ var bodyParser = require('body-parser'),
 
 require('./config/mongoose').init();
 
-exports.init = function (app) {
+exports.init = function ( app ) {
 
   winston.info("Setting up middleware...");
   app.use( morgan('dev') );
@@ -28,5 +28,15 @@ exports.init = function (app) {
   app.enable('trust proxy');
   app.set('x-powered-by', 'Associated Employers');
 
+  winston.info('Registering models...');
+
+  registerModels();
+
   return app;
 };
+
+exports.registerModels = registerModels;
+
+function registerModels () {
+  globSync('./models/**/*.js').map(require);
+}

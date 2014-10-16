@@ -7,13 +7,15 @@ var Employee    = require('../models/employee');
 var Company     = require('../models/company');
 var MedicalRate = require('../models/medical-rate');
 
+
 exports.fetchAll = function ( req, res, next ) {
   console.log(req.query);
-  var query = req.query,
-      limit = parseFloat(query.limit) || 1000,
-      page  = parseFloat(query.page)  || 0,
-      skip  = page * limit,
-      sort  = query.sort || { time_stamp: 1 };
+  var query  = req.query,
+      limit  = parseFloat(query.limit) || null,
+      page   = parseFloat(query.page)  || 0,
+      select = query.select || '',
+      skip   = page * limit,
+      sort   = query.sort || { time_stamp: 1 };
 
   if( req.query.ids ) {
     query._id = {
@@ -26,6 +28,7 @@ exports.fetchAll = function ( req, res, next ) {
   delete query.limit;
   delete query.page;
   delete query.sort;
+  delete query.select;
 
   for ( var key in query ) {
     var v = query[ key ];
@@ -42,9 +45,20 @@ exports.fetchAll = function ( req, res, next ) {
 
   console.log(query, limit, page, skip);
 
-  Employee.find( query ).sort( sort ).skip( Math.abs(skip) ).limit( Math.abs(limit) ).exec(function ( err, records ) {
+  Employee
+  .find( query )
+  .sort( sort )
+  .skip( Math.abs( skip ) )
+  .limit( Math.abs( limit ) )
+  .select( select )
+  .populate('plans.medical plans.dental plans.vision plans.life')
+  .exec(function ( err, records ) {
     if( err ) {
       return respond.error.res( res, err, true );
+    }
+
+    if( records.length < 1 ) {
+      return respond.code.notfound( res );
     }
 
     Employee.count( query, function ( err, count ) {
@@ -67,6 +81,10 @@ exports.fetchByID = function ( req, res, next ) {
   Employee.findById(id, function ( err, record ) {
     if( err ) {
       return respond.error.res( res, err, true );
+    }
+
+    if( !record ) {
+      return respond.code.notfound( res );
     }
 
     res.json( normalize.employee( record ) );

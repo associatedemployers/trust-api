@@ -11,26 +11,23 @@ var createModel = require('./helpers/create-model');
   Subdoc Schemas
 */
 var contactSchema = new Schema({
-  _id:   { type: Schema.Types.ObjectId, default: Schema.Types.ObjectId },
   type:  String, // home, work, mobile, email
   value: String, // example@example.com
   ext:   String  // 124
-});
+}, { _id: true });
 
 var noteSchema = new Schema({
-  _id:    { type: Schema.Types.ObjectId, default: Schema.Types.ObjectId },
   ebms:   Boolean, // Upload this note to EBMS?
   concat: Boolean, // Concatenate this note in an export to EBMS or access?
   text:   String   // Text of the note
-});
+}, { _id: true });
 
 var beneficiarySchema = new Schema({
-  _id:      { type: Schema.Types.ObjectId, default: Schema.Types.ObjectId },
   type:     String, // primary or contingent
   name:     String, // John Doe
   relation: String, // Brother
   split:    Number  // Split of benefit ( e.g. 50 = 50% of life benefit ) ( 0-100 )
-});
+}, { _id: true });
 
 /*
   Doc Schema
@@ -96,18 +93,18 @@ var employeeSchema = new Schema({
   dependents: [{ type: mongoose.Schema.ObjectId, ref: 'Dependent' }],
 
   // Plans
-  //
-  // Rationale for arrays of objects containing plan refs:
-  // 1) Multiple enrolled plans per employee
-  // 2) ---> Options per plan
-  // 3) Brevity :D
-  // 
-  // Populate these paths normally like .populate('plans.medical.plan')
   plans: {
-    medical: [{ plan: { type: Schema.ObjectId, ref: 'MedicalRate' }, covering: String }],
-    dental:  [{ plan: { type: Schema.ObjectId, ref: 'DentalRate' },  covering: String }],
-    vision:  [{ plan: { type: Schema.ObjectId, ref: 'VisionRate' },  covering: String }],
-    life:    [{ plan: { type: Schema.ObjectId, ref: 'LifeRate' },    covering: String }]
+    medical: [{ type: Schema.ObjectId, ref: 'MedicalRate' }],
+    dental:  [{ type: Schema.ObjectId, ref: 'DentalRate' }],
+    vision:  [{ type: Schema.ObjectId, ref: 'VisionRate' }],
+    life:    [{ type: Schema.ObjectId, ref: 'LifeRate' }]
+  },
+  // Plan Meta
+  planOptions: {
+    medical: { covers: String },
+    dental:  { covers: String },
+    vision:  { covers: String },
+    life:    { covers: String },
   },
 
   // System DTs
