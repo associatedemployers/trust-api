@@ -78,7 +78,10 @@ exports.fetchByID = function ( req, res, next ) {
     return respond.error.res( res, 'Please specify an id in the url.' );
   }
 
-  Employee.findById(id, function ( err, record ) {
+  Employee
+  .findById(id)
+  .populate('plans.medical plans.dental plans.vision plans.life')
+  .exec(function ( err, record ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
