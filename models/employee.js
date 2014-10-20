@@ -28,7 +28,7 @@ var beneficiarySchema = new Schema({
   type:     String, // primary or contingent
   name:     String, // John Doe
   relation: String, // Brother
-  split:    Number, // Split of benefit ( e.g. 50 = 50% of life benefit ) ( 0-100 )
+  split: { type: Number, min: 1, max: 100, default: 100 }, // Split of benefit ( e.g. 50 = 50% of life benefit ) ( 1-100 )
   time_stamp: { type: Date, default: Date.now }
 }, { _id: true });
 
