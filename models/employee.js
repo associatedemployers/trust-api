@@ -13,20 +13,23 @@ var createModel = require('./helpers/create-model');
 var contactSchema = new Schema({
   type:  String, // home, work, mobile, email
   value: String, // example@example.com
-  ext:   String  // 124
+  ext:   String, // 124
+  time_stamp: { type: Date, default: Date.now }
 }, { _id: true });
 
 var noteSchema = new Schema({
   ebms:   Boolean, // Upload this note to EBMS?
   concat: Boolean, // Concatenate this note in an export to EBMS or access?
-  text:   String   // Text of the note
+  text:   String,  // Text of the note
+  time_stamp: { type: Date, default: Date.now }
 }, { _id: true });
 
 var beneficiarySchema = new Schema({
   type:     String, // primary or contingent
   name:     String, // John Doe
   relation: String, // Brother
-  split:    Number  // Split of benefit ( e.g. 50 = 50% of life benefit ) ( 0-100 )
+  split:    Number, // Split of benefit ( e.g. 50 = 50% of life benefit ) ( 0-100 )
+  time_stamp: { type: Date, default: Date.now }
 }, { _id: true });
 
 /*
