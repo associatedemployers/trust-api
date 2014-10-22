@@ -23,6 +23,8 @@ var historyEventSchema = new Schema({
   documentId:    Schema.ObjectId, // Document's ObjectId
   updater:       Schema.ObjectId, // ObjectId of the user updating the document
 
+  eventDate: { type: Date, default: Date.now },
+
   // System
   time_stamp: { type: Date, default: Date.now }
 });
