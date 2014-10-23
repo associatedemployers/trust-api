@@ -8,6 +8,10 @@ exports.employee = function ( employee, meta ) {
   return prefixType( 'employee', employee, meta );
 };
 
+exports.user = function ( user, meta ) {
+  return prefixType( 'user', user, meta );
+};
+
 exports.dependent = function ( employee, meta ) {
   return prefixType( 'dependent', employee, meta );
 };

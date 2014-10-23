@@ -4,9 +4,7 @@ var winston   = require('winston'),
     respond   = require('./response'),
     _         = require('lodash');
 
-var Employee    = require('../models/employee'),
-    Company     = require('../models/company'),
-    MedicalRate = require('../models/medical-rate');
+var User = require('../models/user');
 
 exports.fetchAll = function ( req, res, next ) {
   console.log(req.query);
@@ -45,24 +43,23 @@ exports.fetchAll = function ( req, res, next ) {
 
   console.log(query, limit, page, skip);
 
-  Employee
+  User
   .find( query )
   .sort( sort )
   .skip( Math.abs( skip ) )
   .limit( Math.abs( limit ) )
   .select( select )
-  .populate('plans.medical plans.dental plans.vision plans.life')
   .exec(function ( err, records ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
 
-    Employee.count( query, function ( err, count ) {
+    User.count( query, function ( err, count ) {
       if( err ) {
         return respond.error.res( res, err, true );
       }
 
-      res.json( normalize.employee( records, { totalRecords: count } ) );
+      res.json( normalize.user( records, { totalRecords: count } ) );
     });
   });
 };
@@ -74,9 +71,8 @@ exports.fetchByID = function ( req, res, next ) {
     return respond.error.res( res, 'Please specify an id in the url.' );
   }
 
-  Employee
+  User
   .findById(id)
-  .populate('plans.medical plans.dental plans.vision plans.life')
   .exec(function ( err, record ) {
     if( err ) {
       return respond.error.res( res, err, true );
@@ -86,7 +82,7 @@ exports.fetchByID = function ( req, res, next ) {
       return respond.code.notfound( res );
     }
 
-    res.json( normalize.employee( record ) );
+    res.json( normalize.user( record ) );
   });
 };
 
@@ -105,7 +101,7 @@ exports.update = function ( req, res, next ) {
     return respond.error.res( res, 'Please provide an id with your UPDATE/PUT request' );
   }
 
-  Employee
+  User
   .findById( payload._id )
   .exec(function ( err, record ) {
     if( err ) {
@@ -123,15 +119,14 @@ exports.update = function ( req, res, next ) {
         return respond.error.res( res, err );
       }
 
-      Employee
+      User
       .findById( updated._id )
-      .populate('plans.medical plans.dental plans.vision plans.life')
       .exec(function ( err, updated ) {
         if( err ) {
           return respond.error.res( res, err );
         }
 
-        res.send( normalize.employee( updated ) );
+        res.send( normalize.user( updated ) );
       });
     });
   });
@@ -148,7 +143,7 @@ exports.del = function ( req, res, next ) {
     return respond.error.res( res, 'Please provide an id with your DELETE request' );
   }
 
-  Employee
+  User
   .findByIdAndRemove( payload._id )
   .exec(function ( err, record ) {
     if( err ) {
