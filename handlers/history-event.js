@@ -45,6 +45,10 @@ exports.fetchAll = function ( req, res, next ) {
       return respond.error.res( res, err, true );
     }
 
+    if( !records ) {
+      return respond.code.notfound( res );
+    }
+
     res.json( normalize.historyEvent( records ) );
   });
 };
@@ -59,6 +63,10 @@ exports.fetchByID = function ( req, res, next ) {
   HistoryEvent.findById(id, function ( err, record ) {
     if( err ) {
       return respond.error.res( res, err, true );
+    }
+
+    if( !record ) {
+      return respond.code.notfound( res );
     }
 
     res.json( normalize.historyEvent( record ) );
