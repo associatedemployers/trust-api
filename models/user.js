@@ -11,9 +11,16 @@ var ticker   = require(process.cwd() + '/lib/ticker/ticker'),
     cryptify = require('./plugins/cryptify');
 
 var permissionSchema = new Schema({
-  resource: String, // if any resource
-  endpoint: String, // if not using resource, use endpoint
-  type: [ String ]  // ex. [ 'put', 'get', 'delete', 'post' ]
+  name:  String, // Semantic
+  type:  String, // HTTP Verb
+  value: Boolean
+});
+
+var permissionGroupSchema = new Schema({
+  name:        String,     // if any resource
+  endpoints:   [ String ], // ex. /employees
+  type:        String,
+  permissions: [ permissionSchema ]
 });
 
 var userSchema = new Schema({
@@ -27,10 +34,13 @@ var userSchema = new Schema({
     password: String
   },
 
-  email: String,
-  type:  String,
+  email:         String,
+  type:          String,
+  super:         Boolean,
+  receiveEmails: Boolean,
+  apiAccess:     Boolean,
 
-  permissions: [ permissionSchema ],
+  permissions: [ permissionGroupSchema ],
 
   time_stamp: { type: Date, default: Date.now, index: true }
 });

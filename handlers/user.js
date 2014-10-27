@@ -87,11 +87,27 @@ exports.fetchByID = function ( req, res, next ) {
 };
 
 exports.create = function ( req, res, next ) {
-  respond.code.notimplemented(res);
+ var payload = req.body.user;
+
+  if( !payload ) {
+    return respond.error.res( res, 'Provide a payload with your request, prefixed with the type' );
+  }
+
+  delete payload._id;
+
+  var record = new User( payload );
+
+  record.save(function ( err, record ) {
+    if( err ) {
+      return respond.error.res( res, err, true );
+    }
+
+    res.send( normalize.user( record ) );
+  });
 };
 
 exports.update = function ( req, res, next ) {
-  var payload = req.body.employee;
+  var payload = req.body.user;
 
   if( !payload ) {
     return respond.error.res( res, 'Provide a payload with your request, prefixed with the type' );
@@ -133,7 +149,7 @@ exports.update = function ( req, res, next ) {
 };
 
 exports.del = function ( req, res, next ) {
-  var payload = req.body.employee;
+  var payload = req.body.user;
 
   if( !payload ) {
     return respond.error.res( res, 'Provide a payload with your request, prefixed with the type' );
