@@ -3,7 +3,8 @@
 */
 
 var mongoose = require('mongoose'),
-    winston  = require('winston');
+    winston  = require('winston').loggers.get('default'),
+    chalk    = require('chalk');
 
 var connection;
 
@@ -15,23 +16,19 @@ exports.init = function ( db, address, singleton ) {
   if( !connection && !singleton ) {
     mongoose.connection.close();
 
-    winston.info('Connecting to', db, 'db...');
+    winston.debug(chalk.dim('Connecting to', db, 'db...'));
 
     connection = mongoose.connect(address, db);
 
     return connection;
 
   } else if( singleton ) {
-
-    winston.info('Singleton connection to', db, 'db...');
+    winston.debug(chalk.dim('Singleton connection to', db, 'db...'));
 
     return mongoose.createConnection(address + '/' + db);
-
   } else {
-
-    winston.info('returning existing connection');
+    winston.debug(chalk.dim('Returning existing connection'));
 
     return connection;
-
   }
 };

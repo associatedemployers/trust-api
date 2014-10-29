@@ -4,7 +4,7 @@
   Experimental Route Handler, do not use a url to init a db injection
 */
 
-var winston = require('winston'),
+var winston = require('winston').loggers.get('default'),
     chalk   = require('chalk'),
     _       = require('lodash');
 

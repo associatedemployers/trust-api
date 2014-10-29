@@ -2,14 +2,14 @@ var bodyParser = require('body-parser'),
     express    = require('express'),
     globSync   = require('glob').sync,
     routes     = globSync('./routes/**/*.js', { cwd: __dirname }).map(require),
-    winston    = require('winston'),
+    winston    = require('winston').loggers.get('default'),
+    chalk      = require('chalk'),
     morgan     = require('morgan');
 
 require('./config/mongoose').init();
 
 exports.init = function ( app ) {
-
-  winston.info("Setting up middleware...");
+  winston.debug(chalk.dim('Setting up middleware...'));
   app.use( morgan('dev') );
   app.use( bodyParser.json() );
 
@@ -17,18 +17,16 @@ exports.init = function ( app ) {
     extended: true
   }) );
 
-  winston.info("Getting routes...");
+  winston.debug(chalk.dim('Getting routes...'));
 
   routes.forEach(function(route) {
     route(app);
   });
 
-  winston.info('Setting server options...');
+  winston.debug(chalk.dim('Setting server options...'));
 
   app.enable('trust proxy');
   app.set('x-powered-by', 'Associated Employers');
-
-  winston.info('Registering models...');
 
   registerModels();
 
@@ -38,5 +36,6 @@ exports.init = function ( app ) {
 exports.registerModels = registerModels;
 
 function registerModels () {
+  winston.debug(chalk.dim('Registering models...'));
   globSync('./models/**/*.js').map(require);
 }

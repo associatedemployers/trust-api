@@ -1,6 +1,6 @@
 /* Utilities */
 
-var winston = require('winston'),
+var winston = require('winston').loggers.get('default'),
     chalk   = require('chalk'),
     respond = require('./response');
 
