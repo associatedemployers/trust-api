@@ -7,6 +7,10 @@ var mongoose = require('mongoose'),
 
 var createModel = require('./helpers/create-model');
 
+var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
+    cryptify   = require('./plugins/cryptify'),
+    searchable = require('./plugins/searchable');
+
 /*
   Subdoc Schemas
 */
@@ -123,7 +127,23 @@ var employeeSchema = new Schema({
   time_stamp: { type: Date, default: Date.now, index: true }
 });
 
-// Attach some mongoose hooks
-employeeSchema = require(process.cwd() + '/lib/ticker/ticker').attach( employeeSchema );
+employeeSchema = ticker
+  .attach( employeeSchema )
+  .plugin(searchable, {
+    paths: [
+      'name.first',
+      'name.last',
+      'name.middleInitial',
+      'name.suffix',
+      'address.line1',
+      'address.line2',
+      'address.city',
+      'address.state',
+      'address.zipcode',
+      'notes.$.text',
+      'beneficiaries.$.name',
+      'contact.$.value'
+    ]
+  });
 
 module.exports = createModel('Employee', employeeSchema);

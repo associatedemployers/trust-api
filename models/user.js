@@ -1,5 +1,5 @@
 /*
-  Employee - Server Data Model
+  User (admin) - Server Data Model
 */
 
 var mongoose = require('mongoose'),
@@ -7,8 +7,9 @@ var mongoose = require('mongoose'),
 
 var createModel = require('./helpers/create-model');
 
-var ticker   = require(process.cwd() + '/lib/ticker/ticker'),
-    cryptify = require('./plugins/cryptify');
+var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
+    cryptify   = require('./plugins/cryptify'),
+    searchable = require('./plugins/searchable');
 
 var permissionSchema = new Schema({
   name:  String, // Semantic
@@ -46,9 +47,10 @@ var userSchema = new Schema({
 });
 
 // Attach some mongoose hooks
-userSchema = ticker.attach( userSchema ).plugin(cryptify, {
-  paths: [ 'login.password' ],
-  factor: 11
-});
+userSchema = ticker.attach( userSchema )
+            .plugin(cryptify, {
+              paths: [ 'login.password' ],
+              factor: 11
+            });
 
 module.exports = createModel('User', userSchema);

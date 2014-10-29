@@ -7,6 +7,10 @@ var mongoose = require('mongoose'),
 
 var createModel = require('./helpers/create-model');
 
+var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
+    cryptify   = require('./plugins/cryptify'),
+    searchable = require('./plugins/searchable');
+
 var companySchema = new Schema({
   // From XML -> Companies
   name: {
@@ -65,5 +69,21 @@ var companySchema = new Schema({
   // System
   time_stamp: { type: Date, default: Date.now }
 });
+
+companySchema = ticker
+  .attach( companySchema )
+  .plugin(searchable, {
+    paths: [
+      'name.company',
+      'contact.name',
+      'contact.phone',
+      'contact.fax',
+      'address.line1',
+      'address.line2',
+      'address.city',
+      'address.state',
+      'address.zipcode'
+    ]
+  });
 
 module.exports = createModel('Company', companySchema);
