@@ -146,7 +146,7 @@ describe('Ticker Core', function () {
             throw err;
           }
 
-          expect( _ticker.tick(doc, doc) ).to.become(doc).and.notify(done);
+          expect( _ticker.tick(doc, doc) ).to.become(undefined).and.notify(done);
         });
       });
 
