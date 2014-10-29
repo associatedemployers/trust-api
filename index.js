@@ -1,41 +1,33 @@
-var bodyParser = require('body-parser'),
-    express    = require('express'),
-    globSync   = require('glob').sync,
-    routes     = globSync('./routes/**/*.js', { cwd: __dirname }).map(require),
-    winston    = require('winston').loggers.get('default'),
-    chalk      = require('chalk'),
-    morgan     = require('morgan');
+var cluster = require('cluster'),
+    os      = require('os');
 
-require('./config/mongoose').init();
+if( cluster.isMaster ) {
+  os.cpus().forEach(function ( cpu ) {
+    cluster.fork();
+  });
+} else {
+  process.title = 'Trust API Worker - ' + cluster.worker.id + ' - Node.js';
 
-exports.init = function ( app ) {
-  winston.debug(chalk.dim('Setting up middleware...'));
-  app.use( morgan('dev') );
-  app.use( bodyParser.json() );
+  var winston  = require('winston'),
+      chalk    = require('chalk'),
+      logLevel = ( process.env.environment === 'development' || process.env.environment === 'dev' ) ? 'debug' : 'info';
 
-  app.use( bodyParser.urlencoded({
-    extended: true
-  }) );
-
-  winston.debug(chalk.dim('Getting routes...'));
-
-  routes.forEach(function(route) {
-    route(app);
+  winston.loggers.add('default', {
+    transports: [
+      new ( winston.transports.Console )({ level: logLevel })
+    ]
   });
 
-  winston.debug(chalk.dim('Setting server options...'));
+  winston = winston.loggers.get('default');
 
-  app.enable('trust proxy');
-  app.set('x-powered-by', 'Associated Employers');
+  winston.info(chalk.dim('[', cluster.worker.id, '] Starting worker ...'));
 
-  registerModels();
+  var express = require('express'),
+      server  = require('./app').init(express())
+      port    = process.env.port || 3000;
 
-  return app;
-};
-
-exports.registerModels = registerModels;
-
-function registerModels () {
-  winston.debug(chalk.dim('Registering models...'));
-  globSync('./models/**/*.js').map(require);
+  server.listen(port, function () {
+    winston.info(chalk.dim('[', cluster.worker.id, '] Worker listening on port, ' + port + '...'));
+  });
 }
+
