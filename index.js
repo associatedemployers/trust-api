@@ -23,7 +23,7 @@ if( cluster.isMaster ) {
   winston.info(chalk.dim('[', cluster.worker.id, '] Starting worker ...'));
 
   var express = require('express'),
-      server  = require('./app').init(express())
+      server  = require('./app').init(express()),
       port    = process.env.port || 3000;
 
   server.listen(port, function () {
