@@ -24,6 +24,10 @@ exports.historyEvent = function ( historyEvent, meta ) {
   return prefixType( 'historyEvent', historyEvent, meta );
 };
 
+exports.file = function ( file, meta ) {
+  return prefixType( 'file', file, meta );
+};
+
 /* Private */
 function prefixType ( type, data, meta ) {
   var o = {};

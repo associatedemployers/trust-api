@@ -37,6 +37,7 @@ var companySchema = new Schema({
   visionRates:  [{ type: mongoose.Schema.ObjectId, ref: 'VisionRate' }],
   employees:    [{ type: mongoose.Schema.ObjectId, ref: 'Employee' }],
   locations:    [{ type: mongoose.Schema.ObjectId, ref: 'Location' }],
+  files:        [{ type: mongoose.Schema.ObjectId, ref: 'File' }],
 
   // Legacy Fields and Flags
   legacyCompanyNumber:     String,

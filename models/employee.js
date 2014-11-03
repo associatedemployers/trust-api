@@ -98,6 +98,7 @@ var employeeSchema = new Schema({
   company:    { type: mongoose.Schema.ObjectId, ref: 'Company' },
   location:   { type: mongoose.Schema.ObjectId, ref: 'Location' },  // Track Employee Location
   dependents: [{ type: mongoose.Schema.ObjectId, ref: 'Dependent' }],
+  files:      [{ type: mongoose.Schema.ObjectId, ref: 'File' }],
 
   // Plans
   plans: {
