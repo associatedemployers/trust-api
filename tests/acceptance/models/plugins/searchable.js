@@ -29,8 +29,6 @@ describe('SchemaPlugin :: Searchable', function () {
       }]
     });
 
-    mongoose.connect('mongodb://localhost/test');
-
     done();
   });
 
@@ -54,7 +52,7 @@ describe('SchemaPlugin :: Searchable', function () {
       ]
     });
 
-    var testModel = createModel('Test', _schema);
+    var testModel = createModel('SearchableTest', _schema);
 
     var testRecord = new testModel({
       name: {
