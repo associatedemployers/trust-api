@@ -249,7 +249,7 @@ describe('Ticker Core', function () {
 
                 var eTime = new Date();
 
-                calcs.push( eTime.getTime() - sTime.getTime() )
+                calcs.push( eTime.getTime() - sTime.getTime() );
 
                 testModel.findById(doc._id).populate('historyEvents').exec(function ( err, doc ) {
                   if( err ) {
@@ -285,7 +285,5 @@ describe('Ticker Core', function () {
         });
       });
     });
-
   });
-
 });
