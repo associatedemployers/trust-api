@@ -28,6 +28,14 @@ exports.file = function ( file, meta ) {
   return prefixType( 'file', file, meta );
 };
 
+exports.medicalRate = function ( medicalRate, meta ) {
+  return prefixType( 'medicalRate', medicalRate, meta );
+};
+
+exports.medicalPlan = function ( medicalPlan, meta ) {
+  return prefixType( 'medicalPlan', medicalPlan, meta );
+};
+
 /* Private */
 function prefixType ( type, data, meta ) {
   var o = {};

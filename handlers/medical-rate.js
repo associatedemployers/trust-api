@@ -3,7 +3,7 @@ var winston   = require('winston').loggers.get('default'),
     normalize = require('../config/data-normalization'),
     respond   = require('./response');
 
-var Company = require('../models/company');
+var MedicalRate = require('../models/medical-rate');
 
 exports.fetchAll = function ( req, res, next ) {
   var query  = req.query,
@@ -41,7 +41,7 @@ exports.fetchAll = function ( req, res, next ) {
 
   console.log(query, limit, page, skip);
 
-  Company
+  MedicalRate
   .find( query )
   .sort( sort )
   .skip( Math.abs( skip ) )
@@ -52,12 +52,12 @@ exports.fetchAll = function ( req, res, next ) {
       return respond.error.res( res, err, true );
     }
 
-    Company.count( query, function ( err, count ) {
+    MedicalRate.count( query, function ( err, count ) {
       if( err ) {
         return respond.error.res( res, err, true );
       }
 
-      res.json( normalize.company( records, { totalRecords: count } ) );
+      res.json( normalize.medicalRate( records, { totalRecords: count } ) );
     });
   });
 };
@@ -69,12 +69,12 @@ exports.fetchByID = function ( req, res, next ) {
     return respond.error.res( res, 'Please specify an id in the url.' );
   }
 
-  Company.findById(id, function ( err, record ) {
+  MedicalRate.findById(id, function ( err, record ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
 
-    res.json( normalize.company( record ) );
+    res.json( normalize.medicalRate( record ) );
   });
 };
 
