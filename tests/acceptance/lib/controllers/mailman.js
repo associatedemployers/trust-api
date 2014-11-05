@@ -24,6 +24,16 @@ describe('Mailman', function () {
           testvar: 'OK :)'
         });
 
-    expect( promise ).to.be.fulfilled.and.notify(done);
+    expect(promise).to.be.fulfilled.and.notify(done);
+  });
+
+  it('should be utilize and render .hbs partials', function ( done ) {
+    var postalWorker = new Mailman(),
+        promise = postalWorker.__render('test-partial', {});
+
+    expect(promise).to.be.fulfilled.then(function ( rendered ) {
+      expect(rendered.text).to.contain('Hello :)');
+      done();
+    });
   });
 });

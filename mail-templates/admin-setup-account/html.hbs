@@ -1,0 +1,46 @@
+<table class="body">
+  <tr>
+    <td class="center" align="center" valign="top">
+      <center>
+        {{> "admin-header"}}
+
+        <table class="container page">
+          <tr>
+            <td>
+
+              <table class="row">
+                <tr>
+                  <td class="wrapper last">
+
+                    <table class="twelve columns">
+                      <tr>
+                        <td>
+                          <center>
+                            <h2 class="center">{{name.first}}, <a href="http://aetrust.org/setup-account/{{link}}">click here</a> to setup your admin account</h2>
+                          </center>
+                          <hr />
+                          <p class="lead">An account has been created for you on the AE Trust administration panel. Please go to <a href="http://aetrust.org/setup-account/{{link}}">http://aetrust.org/setup-account/{{link}}</a> to choose your password and finish setting your account up.</p>
+
+                          <p class="signature">
+                            {{#unless sender}}<span class="heart">&lt;3</span><br />{{/unless}}
+                            - <span class="signer">{{#if sender}}{{sender}}{{else}}The AE Administration Bot{{/if}}</span>
+                          </p>
+                        </td>
+                        <td class="expander"></td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
+
+              {{> "admin-footer"}}
+
+            </td>
+          </tr>
+        </table>
+
+      </center>
+    </td>
+  </tr>
+</table>
