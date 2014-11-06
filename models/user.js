@@ -31,7 +31,7 @@ var userSchema = new Schema({
   },
 
   login: {
-    email:    String,
+    email:    { type: String, unique: true },
     password: String
   },
 

@@ -8,18 +8,13 @@ var logger = require('winston').loggers.get('default');
 
 exports.error = {
   res: function ( res, err, thr ) {
-    logger.log('error', err);
-
-    var send = {
-      status: 'error',
-      error: err
-    };
+    logger.log('debug', err);
     
     if( thr ) {
-      res.status(500).json(send);
+      res.status(500).send( err );
       throw new Error(err);
     } else {
-      res.status(400).json(send);
+      res.status(400).send( err );
     }
   },
   log: function ( err ) {

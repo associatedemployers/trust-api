@@ -4,7 +4,8 @@ var winston   = require('winston').loggers.get('default'),
     respond   = require('./response'),
     _         = require('lodash');
 
-var User = require('../models/user');
+var User     = require('../models/user'),
+    ObjectId = require('mongoose').Types.ObjectId;
 
 exports.fetchAll = function ( req, res, next ) {
   console.log(req.query);
@@ -95,14 +96,24 @@ exports.create = function ( req, res, next ) {
 
   delete payload._id;
 
-  var record = new User( payload );
-
-  record.save(function ( err, record ) {
+  User.findOne({ email: payload.email }).exec(function ( err, user ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
 
-    res.send( normalize.user( record ) );
+    if( user ) {
+      return respond.error.res( res, 'User with that email already exists...');
+    }
+
+    var record = new User( payload );
+
+    record.save(function ( err, record ) {
+      if( err ) {
+        return respond.error.res( res, err, true );
+      }
+
+      res.status(201).send( normalize.user( record ) );
+    });
   });
 };
 
@@ -149,23 +160,19 @@ exports.update = function ( req, res, next ) {
 };
 
 exports.del = function ( req, res, next ) {
-  var payload = req.body.user;
+  var id = req.params.id;
 
-  if( !payload ) {
-    return respond.error.res( res, 'Provide a payload with your request, prefixed with the type' );
-  }
-
-  if( !payload._id ) {
+  if( !id && !ObjectId.isValid( id ) ) {
     return respond.error.res( res, 'Please provide an id with your DELETE request' );
   }
 
   User
-  .findByIdAndRemove( payload._id )
+  .findByIdAndRemove( id )
   .exec(function ( err, record ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
 
-    respond.code.ok( res );
+    res.status(200).send( record );
   });
 };
