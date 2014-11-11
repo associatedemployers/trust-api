@@ -7,7 +7,7 @@ var winston   = require('winston').loggers.get('default'),
     _         = require('lodash');
 
 var User    = require('../models/user'),
-    Session = require('../models/session'),
+    session = require('../lib/security/session'),
     token   = require('../lib/security/token');
 
 exports.login = function ( req, res, next ) {
@@ -39,7 +39,11 @@ exports.login = function ( req, res, next ) {
         return respond.status(401).send('Password does not match what we have on file.');
       }
 
-      getSession( user ).then(function ( session ) {
+      var sessionData = {
+
+      };
+
+      session.retrieve( user._id, sessionData, 'Session' ).then(function ( session ) {
 
         // TODO: this
 
@@ -51,41 +55,3 @@ exports.login = function ( req, res, next ) {
   });
 
 };
-
-
-// TODO: finish and move below to session module
-
-/**
- * Deals with session retrieval/creation
- * @param  {[type]} user [description]
- * @return {[type]}      [description]
- */
-function getSession ( user ) {
-  return new Promise(function ( resolve, reject ) {
-    var now = new Date();
-
-    Session.findOne({ user: user._id, expiration: { $gt: now } }).exec(function ( err, existingSession ) {
-      if( err ) {
-        return reject( err );
-      }
-
-      if( existingSession ) {
-        existingSession.expiration = undefined; // Forces a regeneration of the expiration field ( refresh time )
-      }
-
-      var session = existingSession || new Session({
-
-      });
-
-      session.save(function ( err, newSession ) {
-        if( err ) {
-          return reject( err );
-        }
-
-
-      });
-
-    });
-
-  });
-}
