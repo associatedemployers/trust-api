@@ -20,7 +20,12 @@ var sessionSchema = new Schema({
   created:    { type: Date, default: Date.now }
 });
 
-sessionSchema.methods.removeExpired = function () {
+/**
+ * Removes stale sessions
+ * 
+ * @return {Object}             Promise
+ */
+sessionSchema.methods.removeStale = function () {
   var self = this;
 
   return new Promise(function ( resolve, reject ) {
