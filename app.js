@@ -14,11 +14,19 @@ exports.init = function ( app ) {
 
   app.enable('trust proxy');
   app.set('x-powered-by', 'Associated Employers');
-  app.set('worker', cluster.worker.id);
+  
+  if( cluster.worker ) {
+    app.set('worker', cluster.worker.id);
+  }
 
   winston.debug(chalk.dim('Setting up middleware...'));
 
-  app.use( morgan('dev') );
+  var logRoute = ( process.env.environment === 'test' ) ? process.env.verboseLogging : true;
+
+  if( logRoute ) {
+    app.use( morgan('dev') );
+  }
+
   app.use( bodyParser.json() );
 
   app.use(bodyParser.urlencoded({
@@ -26,7 +34,10 @@ exports.init = function ( app ) {
   }));
 
   app.use(function ( req, res, next ) {
-    winston.debug(chalk.dim('Request served by worker', app.settings.worker));
+    if( app.settings.worker ) {
+      winston.debug(chalk.dim('Request served by worker', app.settings.worker));
+    }
+
     next();
   });
 
