@@ -21,10 +21,6 @@ function Cryptify ( schema, options ) {
   workFactor = options.factor || 10;
 
   schema.pre('save', function ( next ) {
-    if( !this.isNew ) {
-      return next();
-    }
-
     var doc = this;
 
     var getPathValue = function ( pathArray ) {
@@ -47,15 +43,14 @@ function Cryptify ( schema, options ) {
         recursive[ pathArray[ len ] ] = value;
     };
 
-    paths.forEach(function ( path ) {
-      var raw = getPathValue( path );
-
-      generateHash( raw ).then(function ( hash ) {
-        setPathValue( doc, path, hash ); 
-      }).catch( next );
-    });
-
-    next();
+    Promise.reduce(paths, function ( doc, path ) {
+      return generateHash( getPathValue( path ) ).then(function ( hash ) {
+        setPathValue( doc, path, hash );
+        return doc;
+      });
+    }, doc).then(function ( newDoc ) {
+      next.call( newDoc );
+    }).catch( next );
   });
 }
 
