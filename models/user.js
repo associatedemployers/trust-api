@@ -35,7 +35,6 @@ var userSchema = new Schema({
     password: String
   },
 
-  email:         String,
   type:          String,
   super:         Boolean,
   receiveEmails: Boolean,

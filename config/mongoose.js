@@ -10,7 +10,7 @@ var connection;
 
 exports.init = function ( db, address, singleton ) {
   // Defaults
-  db      = db      || 'trust';
+  db      = ( process.env.environment === 'test' ) ? 'trusttest' : ( db ) ? db : 'trust';
   address = address || 'localhost';
 
   if( !connection && !singleton ) {

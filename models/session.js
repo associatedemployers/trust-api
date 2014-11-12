@@ -5,7 +5,7 @@
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
-var Promise = require('bluebird'), // jshint ignore:line
+var Promise     = require('bluebird'), // jshint ignore:line
     createModel = require('./helpers/create-model'),
     tokenModule = require(process.cwd() + '/lib/security/token');
 
