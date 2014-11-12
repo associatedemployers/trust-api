@@ -1,10 +1,13 @@
-var express      = require('express'),
-    userHandler  = require('../handlers/user'),
-    loginHandler = require('../handlers/login');
+var express           = require('express'),
+    userHandler       = require('../handlers/user'),
+    loginHandler      = require('../handlers/login'),
+    sessionMiddleware = require('../lib/security/middleware/session')();
 
 module.exports = function ( app ) {
   var userRouter        = express.Router(),
       userUtilityRouter = express.Router();
+
+  userRouter.use( sessionMiddleware );
 
   userRouter.get('/', userHandler.fetchAll);
   userRouter.get('/:id', userHandler.fetchByID);

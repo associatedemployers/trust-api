@@ -20,10 +20,16 @@ var sessionSchema = new Schema({
   created:    { type: Date, default: Date.now }
 });
 
+sessionSchema.virtual('isExpired').get(function () {
+  var now = new Date();
+
+  return this.expiration < now;
+});
+
 /**
  * Removes stale sessions
  * 
- * @return {Object}             Promise
+ * @return {Object} Promise
  */
 sessionSchema.methods.removeStale = function () {
   var self = this;
@@ -37,6 +43,27 @@ sessionSchema.methods.removeStale = function () {
       }
 
       resolve( removed );
+    });
+  });
+};
+
+/**
+ * Refreshes expiration
+ *
+ * @return {Object} Promise
+ */
+sessionSchema.methods.refresh = function () {
+  var self = this;
+
+  return new Promise(function ( resolve, reject ) {
+    self.expiration = undefined;
+
+    self.save(function ( err, refreshed ) {
+      if( err ) {
+        return reject( err );
+      }
+
+      resolve( refreshed );
     });
   });
 };

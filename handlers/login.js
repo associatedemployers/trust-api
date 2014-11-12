@@ -46,7 +46,7 @@ exports.login = function ( req, res, next ) {
         email:  user.email
       };
 
-      session.retrieve( user._id, sessionData, 'Session' ).then(function ( userSession ) {
+      session.create( user._id, sessionData, 'Session' ).then(function ( userSession ) {
         res.json({
           token: userSession.publicKey,
           expiration: userSession.expiration
