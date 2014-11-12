@@ -126,8 +126,8 @@ describe('Route Middleware :: Session', function () {
             .set('X-API-Token', res.body.token)
             .then(function () {});
         });
-
-      
     });
+
+    // TODO: Test for expired handling
   });
 });
