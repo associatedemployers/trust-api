@@ -29,6 +29,8 @@ describe('SchemaPlugin :: Searchable', function () {
       }]
     });
 
+    mongoose.connect('localhost/trusttest');
+
     done();
   });
 
