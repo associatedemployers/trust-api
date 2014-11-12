@@ -28,17 +28,10 @@ describe('Token Module', function () {
   });
 
   it('should generate expirations', function () {
-    var expr = 1,
-        unit = 'hour';
-
-    var generator = token.expirationGenerator( expr, unit );
+    var generator = token.expirationGenerator( 1, 'hour' );
 
     expect(generator).to.be.a('function');
-
-    var result = generator();
-
-    expect(result).to.be.a('date');
-    expect( Math.abs(moment().diff(moment(result), unit)) ).to.equal(expr);
+    expect(generator()).to.be.a('date');
   });
 
 });
