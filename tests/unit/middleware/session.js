@@ -42,7 +42,7 @@ describe('Route Middleware :: Session', function () {
   });
 
   describe('Operations', function () {
-    var _router, _app;
+    var _router, _app, _token;
 
     /* Test support */
     before(function ( done ) {
@@ -121,13 +121,45 @@ describe('Route Middleware :: Session', function () {
           // Proper res body
           expect(res.body.token).to.exist.and.to.be.a('string');
 
+          _token = res.body.token;
+
           chai.request(_app)
             .get('/api/protected-resource')
-            .set('X-API-Token', res.body.token)
+            .set('X-API-Token', _token)
             .then(function () {});
         });
     });
 
-    // TODO: Test for expired handling
+    it('should handle expired tokens', function ( done ) {
+      var Session = require(cwd + '/lib/security/session');
+
+      Session.get( _token ).then(function ( _session ) {
+        expect(_session).to.be.an('object');
+
+        _session.expiration = new Date();
+
+        _session.save(function ( err, updated ) {
+          expect(err).to.not.exist;
+          expect(updated).to.exist;
+
+          _router.use( sessionMiddleware() );
+          _router.get('/protected-resource', function () {});
+
+          _app.use('/api', _router);
+
+          chai.request(_app)
+            .get('/api/protected-resource')
+            .set('X-API-Token', _token)
+            .then(function ( res ) {
+              // Status Code 401
+              expect(res).to.have.status(401);
+              // Relevant Error Message
+              expect(res.text).to.contain('expired').and.to.contain('session');
+              done();
+            });
+        });
+
+      });
+    });
   });
 });
