@@ -4,7 +4,7 @@ var winston = require('winston').loggers.get('default'),
     chalk   = require('chalk'),
     respond = require('./response');
 
-var dataSignature = require(process.cwd() + '/config/keys').dataSignature,
+var dataSignature = ( process.env.environment === 'test' ) ? '12345678123456789' : require(process.cwd() + '/config/keys').dataSignature,
     encryptor     = require('simple-encryptor')( dataSignature );
 
 exports.decryptSSN = function ( req, res, next ) {
