@@ -54,7 +54,9 @@ describe('Route Middleware :: Session', function () {
 
     after(function ( done ) {
       var mongoose = require('mongoose');
-      mongoose.connection.db.dropDatabase(done);
+      mongoose.connection.db.dropDatabase(function () {
+        done();
+      });
     });
 
     beforeEach(function () {
