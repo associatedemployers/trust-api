@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
 var createModel = require('./helpers/create-model');
 
 var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
-    cryptify   = require('./plugins/cryptify'),
+    cryptify   = require('mongoose-cryptify'),
     searchable = require('./plugins/searchable');
 
 var permissionSchema = new Schema({
