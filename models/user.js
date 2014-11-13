@@ -14,7 +14,6 @@ var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
 var permissionSchema = new Schema({
   name:  String, // Semantic
   type:  String, // HTTP Verb
-  value: Boolean
 });
 
 var permissionGroupSchema = new Schema({
