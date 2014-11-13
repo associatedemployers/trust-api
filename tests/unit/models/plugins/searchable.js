@@ -29,12 +29,10 @@ describe('SchemaPlugin :: Searchable', function () {
       }]
     });
 
-    mongoose.connect('localhost/trusttest');
-
     done();
   });
 
-  afterEach(function ( done ) {
+  after(function ( done ) {
     mongoose.connection.db.dropDatabase(function () {
       mongoose.disconnect(function () {
         done();
