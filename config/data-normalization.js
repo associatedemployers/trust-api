@@ -36,6 +36,10 @@ exports.medicalPlan = function ( medicalPlan, meta ) {
   return prefixType( 'medicalPlan', medicalPlan, meta );
 };
 
+exports.permission = function ( permission, meta ) {
+  return prefixType( 'permissionGroup', permission, meta );
+};
+
 /* Private */
 function prefixType ( type, data, meta ) {
   var o = {};

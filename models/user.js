@@ -11,18 +11,6 @@ var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
     cryptify   = require('mongoose-cryptify'),
     searchable = require('./plugins/searchable');
 
-var permissionSchema = new Schema({
-  name:  String, // Semantic
-  type:  String, // HTTP Verb
-});
-
-var permissionGroupSchema = new Schema({
-  name:        String,     // if any resource
-  endpoints:   [ String ], // ex. /employees
-  type:        String,
-  permissions: [ permissionSchema ]
-});
-
 var userSchema = new Schema({
   name: {
     first: String,
@@ -39,7 +27,7 @@ var userSchema = new Schema({
   receiveEmails: Boolean,
   apiAccess:     Boolean,
 
-  permissions: [ permissionGroupSchema ],
+  permissions: [{ type: Schema.ObjectId, ref: 'PermissionGroup' }],
 
   time_stamp: { type: Date, default: Date.now, index: true }
 });

@@ -88,7 +88,7 @@ exports.fetchByID = function ( req, res, next ) {
 };
 
 exports.create = function ( req, res, next ) {
- var payload = req.body.user;
+  var payload = req.body.user;
 
   if( !payload ) {
     return respond.error.res( res, 'Provide a payload with your request, prefixed with the type' );
