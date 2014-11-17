@@ -80,7 +80,7 @@ describe('Route Middleware :: Authorization', function () {
         });
 
         user.save(done);
-      })
+      });
     });
 
     after(function ( done ) {
