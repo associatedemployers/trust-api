@@ -48,32 +48,39 @@ describe('Route Middleware :: Authorization', function () {
     /* Test support */
     before(function ( done ) {
       var User = require(cwd + '/models/user'),
-          user = new User({
-            type: 'admin',
-            login: {
-              email: 'mocha@test.js',
-              password: 'latte'
-            },
+          PermissionGroup = require(cwd + '/models/permission-group'),
+          permission = new PermissionGroup({
+            name: 'Protected resource',
+            endpoints: [ '/protected-resource' ],
+            type: 'resource',
             permissions: [
               {
-                name: 'Protected resource',
-                endpoints: [ '/protected-resource' ],
-                type: 'resource',
-                permissions: [
-                  {
-                    name: 'View',
-                    type: 'get'
-                  },
-                  {
-                    name: 'Update',
-                    type: 'put'
-                  }
-                ]
+                name: 'View',
+                type: 'get'
+              },
+              {
+                name: 'Update',
+                type: 'put'
               }
             ]
           });
 
-      user.save(done);
+      permission.save(function ( err, perm ) {
+        if( err ) {
+          throw err;
+        }
+
+        var user = new User({
+          type: 'admin',
+          login: {
+            email: 'mocha@test.js',
+            password: 'latte'
+          },
+          permissions: [ perm._id ]
+        });
+
+        user.save(done);
+      })
     });
 
     after(function ( done ) {
