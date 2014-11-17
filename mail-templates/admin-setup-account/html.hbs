@@ -16,17 +16,29 @@
                       <tr>
                         <td>
                           <center>
-                            <h2 class="center">{{name.first}}, <a href="http://aetrust.org/setup-account/{{link}}">click here</a> to setup your admin account</h2>
+                            <h2 class="center spaced">Setup your admin account, {{name.first}}!</h2>
                           </center>
                           <hr />
-                          <p class="lead">An account has been created for you on the AE Trust administration panel. Please go to <a href="http://aetrust.org/setup-account/{{link}}">http://aetrust.org/setup-account/{{link}}</a> to choose your password and finish setting your account up.</p>
-
-                          <p class="signature">
-                            {{#unless sender}}<span class="heart">&lt;3</span><br />{{/unless}}
-                            - <span class="signer">{{#if sender}}{{sender}}{{else}}The AE Administration Bot{{/if}}</span>
-                          </p>
+                          <h5 class="center spaced">
+                            <a href="http://aetrust.org/setup-account/{{link}}">http://aetrust.org/setup-account/{{link}}</a><br />
+                            <span class="small">
+                              Click the link above to complete your account setup
+                            </span>
+                          </h5>
+                          
                         </td>
                         <td class="expander"></td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p class="lead">An account has been created for you on the AE Trust administration panel. You are required to follow the link above and provide your preferred password before you can use the account.</p>
+                        </td>
+                        <td class="expander"></td>
+                      </tr>
+                      <tr class="signature">
+                        <td>
+                          ~AE Mailbot
+                        </td>
                       </tr>
                     </table>
 
@@ -35,7 +47,6 @@
               </table>
 
               {{> "admin-footer"}}
-
             </td>
           </tr>
         </table>
