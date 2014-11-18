@@ -10,7 +10,7 @@ var createModel = require('./helpers/create-model');
 var permissionSchema = new Schema({
   name:  String, // Semantic
   type:  String, // HTTP Verb
-});
+}, { _id: false });
 
 var permissionGroupSchema = new Schema({
   name:        String,     // if any resource
