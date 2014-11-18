@@ -47,7 +47,7 @@ describe('Route Middleware :: Authorization', function () {
 
     /* Test support */
     before(function ( done ) {
-      var User = require(cwd + '/models/user'),
+      var User            = require(cwd + '/models/user'),
           PermissionGroup = require(cwd + '/models/permission-group'),
           permission = new PermissionGroup({
             name: 'Protected resource',
