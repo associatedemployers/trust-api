@@ -49,7 +49,8 @@ exports.login = function ( req, res, next ) {
       session.create( user._id, sessionData, 'Session' ).then(function ( userSession ) {
         res.json({
           token: userSession.publicKey,
-          expiration: userSession.expiration
+          expiration: userSession.expiration,
+          user: userSession.user.toString()
         });
       }).catch(function ( err ) {
         return respond.error.res( res, err, true );
