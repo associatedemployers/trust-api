@@ -8,7 +8,6 @@ module.exports = function (app) {
   permissionRouter.use( sessionMiddleware('Session') );
 
   permissionRouter.get('/', permissionHandler.fetchAll);
-  permissionRouter.get('/:id', permissionHandler.fetchByID);
 
   permissionRouter.post('/', permissionHandler.create);
 
