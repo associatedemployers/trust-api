@@ -36,24 +36,12 @@ exports.fetchAll = function ( req, res, next ) {
   });
 };
 
-exports.fetchByID = function ( req, res, next ) {
-  var id = req.params.id;
-
-  if( !id ) {
-    return respond.error.res(res, 'Please specify an id in the url.');
-  }
-
-  PermissionGroup.findById(id, function ( err, record ) {
-    if( err ) {
-      return respond.error.res( res, err, true );
-    }
-
-    res.json( normalize.permission( record ) );
-  });
-};
-
 exports.create = function ( req, res, next ) {
   var payload = req.body.permissionGroup;
+
+    if( !req.session.user.super ) {
+    return res.status(401).send('Users without "super" status are not allowed to create permissions');
+  }
 
   if( !payload ) {
     return respond.error.res(res, 'Provide a payload with your request, prefixed with the type');
@@ -74,6 +62,10 @@ exports.create = function ( req, res, next ) {
 
 exports.update = function ( req, res, next ) {
   var payload = req.body.permissionGroup;
+
+  if( !req.session.user.super ) {
+    return res.status(401).send('Users without "super" status are not allowed to edit permissions');
+  }
 
   if( !payload ) {
     return respond.error.res(res, 'Provide a payload with your request, prefixed with the type');
@@ -111,6 +103,10 @@ exports.update = function ( req, res, next ) {
 
 exports.del = function ( req, res, next ) {
   var payload = req.body.permissionGroup;
+
+  if( !req.session.user.super ) {
+    return res.status(401).send('Users without "super" status are not allowed to delete permissions');
+  }
 
   if( !payload ) {
     return respond.error.res(res, 'Provide a payload with your request, prefixed with the type');
