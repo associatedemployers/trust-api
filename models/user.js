@@ -27,7 +27,7 @@ var userSchema = new Schema({
   receiveEmails: Boolean,
   apiAccess:     Boolean,
 
-  permissions: [{ type: Schema.ObjectId, ref: 'PermissionGroup' }],
+  permissions: [{ type: Schema.ObjectId, ref: 'UserPermission' }],
 
   time_stamp: { type: Date, default: Date.now, index: true }
 });

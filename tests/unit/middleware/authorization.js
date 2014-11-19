@@ -33,6 +33,7 @@ if( !process.env.verboseLogging ) {
 
 var authorizationMiddleware = require(cwd + '/lib/security/middleware/authorization'),
     sessionMiddleware       = require(cwd + '/lib/security/middleware/session'),
+    mongoose                = require('mongoose'),
     express                 = require('express'),
     app                     = require(cwd + '/app');
 
@@ -49,9 +50,10 @@ describe('Route Middleware :: Authorization', function () {
     before(function ( done ) {
       var User            = require(cwd + '/models/user'),
           PermissionGroup = require(cwd + '/models/permission-group'),
+          UserPermission  = require(cwd + '/models/user-permission'),
           permission = new PermissionGroup({
             name: 'Protected resource',
-            endpoints: [ '/protected-resource' ],
+            endpoints: [ '/protected-resource', '/protected-resource/:id' ],
             type: 'resource',
             permissions: [
               {
@@ -70,21 +72,33 @@ describe('Route Middleware :: Authorization', function () {
           throw err;
         }
 
-        var user = new User({
-          type: 'admin',
-          login: {
-            email: 'mocha@test.js',
-            password: 'latte'
-          },
-          permissions: [ perm._id ]
-        });
+        var userPerms = perm.permissions.toObject(),
+            userId    = mongoose.Types.ObjectId();
 
-        user.save(done);
+        userPerms[0].group = userPerms[1].group = perm._id;
+        userPerms[0].user  = userPerms[1].user  = userId;
+
+        UserPermission.create(userPerms, function ( err, firstPerm, secondPerm ) {
+          if( err ) {
+            throw err;
+          }
+
+          var user = new User({
+            _id: userId,
+            type: 'admin',
+            login: {
+              email: 'mocha@test.js',
+              password: 'latte'
+            },
+            permissions: [ firstPerm._id, secondPerm._id ]
+          });
+
+          user.save( done );
+        });
       });
     });
 
     after(function ( done ) {
-      var mongoose = require('mongoose');
       mongoose.connection.db.dropDatabase(done);
     });
 
@@ -206,9 +220,7 @@ describe('Route Middleware :: Authorization', function () {
       _router.use( sessionMiddleware() );
       _router.use( authorizationMiddleware() );
       _router.get('/protected-resource', function ( req ) {
-        expect(req.permission).to.be.an('object').and.to.include.keys('group', 'set');
         expect(req.permission.group, 'Permission Group').to.be.an('object');
-        expect(req.permission.set, 'Permission Set').to.be.an('object');
         done();
       });
 
