@@ -1,4 +1,4 @@
-var winston   = require('winston').loggers.get('default'),
+var winston   = require('winston'),
     chalk     = require('chalk'),
     normalize = require('../config/data-normalization'),
     respond   = require('./response'),

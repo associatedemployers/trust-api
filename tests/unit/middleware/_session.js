@@ -1,6 +1,4 @@
 /* jshint expr:true */
-process.env.environment = 'test';
-
 var cwd = process.cwd();
 
 var chai    = require('chai'),
@@ -21,15 +19,6 @@ plugins.map(function ( plugin ) {
 });
 
 chai.request.addPromises(Promise);
-
-if( !process.env.verboseLogging ) {
-  // Suppress debug logging
-  winston.loggers.add('default', {
-    transports: [
-      new ( winston.transports.Console )({ level: 'info' })
-    ]
-  });
-}
 
 var sessionMiddleware = require(cwd + '/lib/security/middleware/session'),
     express           = require('express'),

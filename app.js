@@ -3,7 +3,7 @@ var bodyParser = require('body-parser'),
     globSync   = require('glob').sync,
     routes     = globSync('./routes/**/*.js', { cwd: __dirname }).map(require),
     cluster    = require('cluster'),
-    winston    = require('winston').loggers.get('default'),
+    winston    = require('winston'),
     chalk      = require('chalk'),
     morgan     = require('morgan');
 

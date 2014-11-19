@@ -4,7 +4,7 @@
   Simplifies & standardizes responses
 */
 
-var logger = require('winston').loggers.get('default');
+var logger = require('winston');
 
 exports.error = {
   res: function ( res, err, thr ) {
