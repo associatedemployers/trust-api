@@ -137,6 +137,7 @@ describe('Route Middleware :: Session', function () {
 
       Session.get( _token ).then(function ( _session ) {
         expect(_session).to.be.an('object');
+        expect(_session.user).to.be.an('object');
 
         _session.expiration = new Date();
 

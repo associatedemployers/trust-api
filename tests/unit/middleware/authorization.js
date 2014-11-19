@@ -220,7 +220,7 @@ describe('Route Middleware :: Authorization', function () {
       _router.use( sessionMiddleware() );
       _router.use( authorizationMiddleware() );
       _router.get('/protected-resource', function ( req ) {
-        expect(req.permission.group, 'Permission Group').to.be.an('object');
+        expect(req.permission, 'Permission').to.be.an('object');
         done();
       });
 
@@ -253,11 +253,11 @@ describe('Route Middleware :: Authorization', function () {
       _router.use( sessionMiddleware() );
       _router.use( authorizationMiddleware() );
       _router.get('/protected-resource/:id/test', function ( req ) {
-        expect(req.permission.group, 'Permission Group').to.be.an('object');
+        expect(req.permission, 'Permission').to.be.an('object');
         done();
       });
       _router.get('/protected-resource/:id', function ( req, res ) {
-        expect(req.permission.group, 'Permission Group').to.be.an('object');
+        expect(req.permission, 'Permission').to.be.an('object');
         res.status(200).end();
       });
 

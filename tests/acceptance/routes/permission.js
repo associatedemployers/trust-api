@@ -31,8 +31,9 @@ if( !process.env.verboseLogging ) {
   });
 }
 
-var app     = require(cwd + '/app').init( require('express')() ),
-    session = require(cwd + '/lib/security/session');
+var app      = require(cwd + '/app').init( require('express')() ),
+    session  = require(cwd + '/lib/security/session'),
+    mongoose = require('mongoose');
 
 describe('Route :: Permissions', function () {
 
@@ -42,7 +43,8 @@ describe('Route :: Permissions', function () {
     /* Test support */
     before(function ( done ) {
       var User            = require(cwd + '/models/user'),
-          PermissionGroup = require(cwd + '/models/permission-group');
+          PermissionGroup = require(cwd + '/models/permission-group'),
+          UserPermission  = require(cwd + '/models/user-permission');
 
       var permissionArray = [{
         name: 'Protected resource',
@@ -68,27 +70,39 @@ describe('Route :: Permissions', function () {
           throw err;
         }
 
-        _perms = [ firstPerm, secondPerm ];
+        var userPerm = firstPerm.permissions.toObject()[0],
+            userId   = mongoose.Types.ObjectId();
 
-        var user = new User({
-          type: 'admin',
-          login: {
-            email: 'mocha@test.js',
-            password: 'latte'
-          },
-          permissions: [ firstPerm._id ]
-        });
+        userPerm.group = firstPerm._id;
+        userPerm.user  = userId;
 
-        user.save(function ( err, user ) {
+        UserPermission.create(userPerm, function ( err, firstUserPerm ) {
           if( err ) {
             throw err;
           }
 
-          session.create( user._id, {}, 'Session' ).then(function ( userSession ) {
-            _token = userSession.publicKey;
-            done();
-          }).catch(function ( err ) {
-            return respond.error.res( res, err, true );
+          _perms = [ firstPerm, secondPerm ];
+
+          var user = new User({
+            type: 'admin',
+            login: {
+              email: 'mocha@test.js',
+              password: 'latte'
+            },
+            permissions: [ firstUserPerm._id.toString() ]
+          });
+
+          user.save(function ( err, user ) {
+            if( err ) {
+              throw err;
+            }
+
+            session.create( user._id, {}, 'Session' ).then(function ( userSession ) {
+              _token = userSession.publicKey;
+              done();
+            }).catch(function ( err ) {
+              return respond.error.res( res, err, true );
+            });
           });
         });
       });

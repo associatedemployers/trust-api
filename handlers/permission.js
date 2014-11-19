@@ -4,31 +4,35 @@ var winston   = require('winston').loggers.get('default'),
     normalize = require('../config/data-normalization'),
     respond   = require('./response');
 
-var PermissionGroup = require('../models/permission-group');
+var UserPermission  = require('../models/user-permission'),
+    PermissionGroup = require('../models/permission-group');
 
 exports.fetchAll = function ( req, res, next ) {
-  var query  = {};
+  var user = req.session.user;
 
-  if( req.query.ids ) {
-    query._id = {
-      $in: req.query.ids
-    };
-  }
-
-  PermissionGroup
-  .find( query )
-  .exec(function ( err, records ) {
+  UserPermission.populate(user.permissions, { path: 'group' }, function ( err, permissions ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
 
-    PermissionGroup.count( query, function ( err, count ) {
-      if( err ) {
-        return respond.error.res( res, err, true );
-      }
+    var permissionGroups = _.pluck(_.uniq(permissions, function ( permission ) {
+      return permission.group._id;
+    }), 'group');
 
-      res.json( normalize.permission( records, { totalRecords: count } ) );
+    permissionGroups = permissionGroups.map(function ( group ) {
+      var relevantPermissions = permissions.filter(function ( p ) {
+        return p.group._id.toString() === group._id.toString();
+      });
+
+      group.permissions = group.permissions.filter(function ( permissionInGroup ) {
+        var found = _.find( relevantPermissions, { type: permissionInGroup.type });
+        return !!found;
+      });
+
+      return group;
     });
+
+    res.json( normalize.permission( permissionGroups ) );
   });
 };
 
