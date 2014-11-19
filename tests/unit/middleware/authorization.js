@@ -248,5 +248,49 @@ describe('Route Middleware :: Authorization', function () {
             .then(function () {});
         });
     });
+
+    it('should allow requests with proper permissions to a url with a dynamic segment', function ( done ) {
+      _router.use( sessionMiddleware() );
+      _router.use( authorizationMiddleware() );
+      _router.get('/protected-resource/:id/test', function ( req ) {
+        expect(req.permission.group, 'Permission Group').to.be.an('object');
+        done();
+      });
+      _router.get('/protected-resource/:id', function ( req, res ) {
+        expect(req.permission.group, 'Permission Group').to.be.an('object');
+        res.status(200).end();
+      });
+
+      _app.use('/api', _router);
+
+      chai.request(_app)
+        .post('/api/user/login')
+        .send({
+          email: 'mocha@test.js',
+          password: 'latte'
+        })
+        .then(function ( res ) {
+          // Status Code 200
+          expect(res).to.have.status(200);
+          // Token object
+          expect(res).to.be.json;
+          // Proper res body
+          expect(res.body.token).to.exist.and.to.be.a('string');
+
+          _token = res.body.token;
+
+          chai.request(_app)
+            .get('/api/protected-resource/12345678912345678912345678')
+            .set('X-API-Token', _token)
+            .then(function ( res ) {
+              expect(res).to.have.status(200);
+
+              chai.request(_app)
+                .get('/api/protected-resource/12345678912345678912345678/test')
+                .set('X-API-Token', _token)
+                .then(function () {});
+            });
+        });
+    });
   });
 });
