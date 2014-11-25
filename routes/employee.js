@@ -9,8 +9,8 @@ module.exports = function ( app ) {
   var employeeRouter        = express.Router(),
       employeeUtilityRouter = express.Router();
 
-  //employeeRouter.use( sessionMiddleware('Session') );
-  //employeeRouter.use( authorizationMiddleware({ allow: 'admin' }) );
+  employeeRouter.use( sessionMiddleware('Session') );
+  employeeRouter.use( authorizationMiddleware({ allow: 'admin' }) );
 
   employeeRouter.get('/', employeeHandler.fetchAll);
   employeeRouter.get('/:id', employeeHandler.fetchByID);
