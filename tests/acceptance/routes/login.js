@@ -137,9 +137,9 @@ describe('Route :: Login', function () {
           // Token object
           expect(res).to.be.json;
           // Proper res body
-          expect(res.body.token).to.exist.and.to.be.a('string');
-          expect(res.body.expiration).to.exist;
-          expect(res.body.user).to.exist;
+          expect(res.body.token, 'First Response Token').to.exist.and.to.be.a('string');
+          expect(res.body.expiration, 'First Response Expiration').to.exist;
+          expect(res.body.user, 'First Response User').to.exist;
           expect(moment(res.body.expiration).isValid()).to.equal(true);
 
           chai.request(app)
@@ -149,9 +149,9 @@ describe('Route :: Login', function () {
               password: 'latte'
             })
             .then(function ( secondRes ) {
-              expect(secondRes.body.token).to.equal(res.body.token)
-              expect(secondRes.body.expiration).to.not.equal(res.body.expiration); // Expiration refresh
-              expect(secondRes.body.user).to.equal(res.body.user);
+              expect(secondRes.body.token, 'Second Response Token').to.equal(res.body.token);
+              expect(secondRes.body.expiration, 'Second Response Expiration').to.not.equal(res.body.expiration); // Expiration refresh
+              expect(secondRes.body.user, 'Second Response User').to.equal(res.body.user);
               done();
             });
         });

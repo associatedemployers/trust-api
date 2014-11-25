@@ -9,14 +9,16 @@ var Promise     = require('bluebird'), // jshint ignore:line
     createModel = require('./helpers/create-model'),
     tokenModule = require(process.cwd() + '/lib/security/token');
 
+expirationGen = tokenModule.expirationGenerator(2, 'hours');
+
 // Doc Schema
 var sessionSchema = new Schema({
   publicKey:  { type: String, index: true },
-  privatekey: String,
+  privateKey: String,
 
   user: { type: Schema.ObjectId, ref: 'User', index: true },
 
-  expiration: { type: Date, default: tokenModule.expirationGenerator(2, 'hours'), index: true },
+  expiration: { type: Date, default: expirationGen, index: true },
   created:    { type: Date, default: Date.now }
 });
 
@@ -56,7 +58,7 @@ sessionSchema.methods.refresh = function () {
   var self = this;
 
   return new Promise(function ( resolve, reject ) {
-    self.expiration = undefined;
+    self.expiration = expirationGen();
 
     self.save(function ( err, refreshed ) {
       if( err ) {

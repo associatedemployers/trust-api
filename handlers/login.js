@@ -43,7 +43,7 @@ exports.login = function ( req, res, next ) {
 
       var sessionData = {
         userId: user._id.toString(),
-        email:  user.email
+        email:  user.login.email
       };
 
       session.create( user._id, sessionData, 'Session' ).then(function ( userSession ) {
