@@ -123,5 +123,38 @@ describe('Route :: Login', function () {
           done();
         });
     });
+
+    it('should give back same session if not expired', function ( done ) {
+      chai.request(app)
+        .post('/api/user/login')
+        .send({
+          email: 'mocha@test.js',
+          password: 'latte'
+        })
+        .then(function ( res ) {
+          // Status Code 200
+          expect(res).to.have.status(200);
+          // Token object
+          expect(res).to.be.json;
+          // Proper res body
+          expect(res.body.token).to.exist.and.to.be.a('string');
+          expect(res.body.expiration).to.exist;
+          expect(res.body.user).to.exist;
+          expect(moment(res.body.expiration).isValid()).to.equal(true);
+
+          chai.request(app)
+            .post('/api/user/login')
+            .send({
+              email: 'mocha@test.js',
+              password: 'latte'
+            })
+            .then(function ( secondRes ) {
+              expect(secondRes.body.token).to.equal(res.body.token)
+              expect(secondRes.body.expiration).to.not.equal(res.body.expiration); // Expiration refresh
+              expect(secondRes.body.user).to.equal(res.body.user);
+              done();
+            });
+        });
+    });
   });
 });
