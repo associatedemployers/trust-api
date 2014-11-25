@@ -238,6 +238,41 @@ describe('Route Middleware :: Authorization', function () {
         });
     });
 
+    it('should work with mounted routers', function ( done ) {
+      var router = express.Router();
+
+      _router.use( sessionMiddleware() );
+      _router.use( authorizationMiddleware() );
+      _router.get('/', function ( req ) {
+        expect(req.permission, 'Permission').to.be.an('object');
+        done();
+      });
+
+      _app.use('/api/protected-resource', _router);
+
+      chai.request(_app)
+        .post('/api/user/login')
+        .send({
+          email: 'mocha@test.js',
+          password: 'latte'
+        })
+        .then(function ( res ) {
+          // Status Code 200
+          expect(res).to.have.status(200);
+          // Token object
+          expect(res).to.be.json;
+          // Proper res body
+          expect(res.body.token).to.exist.and.to.be.a('string');
+
+          _token = res.body.token;
+
+          chai.request(_app)
+            .get('/api/protected-resource')
+            .set('X-API-Token', _token)
+            .then(function () {});
+        });
+    });
+
     it('should allow requests with proper permissions to a url with a dynamic segment', function ( done ) {
       _router.use( sessionMiddleware() );
       _router.use( authorizationMiddleware() );

@@ -6,6 +6,7 @@ module.exports = function (app) {
   var permissionRouter = express.Router();
 
   permissionRouter.use( sessionMiddleware('Session') );
+
   permissionRouter.get('/', permissionHandler.fetchAll);
   permissionRouter.post('/', permissionHandler.create);
   permissionRouter.put('/:id', permissionHandler.update);
