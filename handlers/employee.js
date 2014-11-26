@@ -17,6 +17,12 @@ exports.fetchAll = function ( req, res, next ) {
       skip   = page * limit,
       sort   = query.sort || { time_stamp: 1 };
 
+  if( query._distinct === 'true' ) {
+    return Employee.distinct({}, select).exec().then(function ( items ) {
+      res.send( items );
+    });
+  }
+
   if( req.query.ids ) {
     query._id = {
       $in: req.query.ids
