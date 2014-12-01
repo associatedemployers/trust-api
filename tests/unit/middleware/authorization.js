@@ -42,7 +42,7 @@ describe('Route Middleware :: Authorization', function () {
           UserPermission  = require(cwd + '/models/user-permission'),
           permission = new PermissionGroup({
             name: 'Protected resource',
-            endpoints: [ '/protected-resource', '/protected-resource/:id' ],
+            endpoints: [ '/protected-resource', '/protected-resource/:id', '/protected-resource/:id/test' ],
             type: 'resource',
             permissions: [
               {
@@ -276,10 +276,11 @@ describe('Route Middleware :: Authorization', function () {
     it('should allow requests with proper permissions to a url with a dynamic segment', function ( done ) {
       _router.use( sessionMiddleware() );
       _router.use( authorizationMiddleware() );
-      _router.get('/protected-resource/:id/test', function ( req ) {
+      _router.get('/protected-resource/:id/test', function ( req, res ) {
         expect(req.permission, 'Permission').to.be.an('object');
-        done();
+        res.status(200).end();
       });
+      _router.get('/protected-resource/:id/test/test2', function () {});
       _router.get('/protected-resource/:id', function ( req, res ) {
         expect(req.permission, 'Permission').to.be.an('object');
         res.status(200).end();
@@ -304,15 +305,27 @@ describe('Route Middleware :: Authorization', function () {
           _token = res.body.token;
 
           chai.request(_app)
-            .get('/api/protected-resource/12345678912345678912345678')
+            .get('/api/protected-resource/545a5a2822437826c0e58a59')
             .set('X-API-Token', _token)
             .then(function ( res ) {
-              expect(res).to.have.status(200);
 
               chai.request(_app)
-                .get('/api/protected-resource/12345678912345678912345678/test')
+                .get('/api/protected-resource/545a5a2822437826c0e58a59/test')
                 .set('X-API-Token', _token)
-                .then(function () {});
+                .then(function ( res ) {
+                  expect(res).to.have.status(200);
+                  
+                  chai.request(_app)
+                    .get('/api/protected-resource/545a5a2822437826c0e58a59/test/test2')
+                    .set('X-API-Token', _token)
+                    .then(function ( res ) {              
+                      // Status Code 401
+                      expect(res).to.have.status(401);
+                      // Relevant Error Message
+                      expect(res.text).to.contain('permission').and.to.contain('test2');
+                      done();
+                    });
+                });
             });
         });
     });
