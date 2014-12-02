@@ -308,6 +308,7 @@ describe('Route Middleware :: Authorization', function () {
             .get('/api/protected-resource/545a5a2822437826c0e58a59')
             .set('X-API-Token', _token)
             .then(function ( res ) {
+              expect(res).to.have.status(200);
 
               chai.request(_app)
                 .get('/api/protected-resource/545a5a2822437826c0e58a59/test')
