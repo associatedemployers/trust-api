@@ -6,7 +6,8 @@ var mongoose   = require('mongoose'),
     Schema     = mongoose.Schema,
     momentDate = require('../lib/utilities/moment-date');
 
-var createModel = require('./helpers/create-model');
+var createModel = require('./helpers/create-model'),
+    searchable  = require('./plugins/searchable');
 
 var planSchema = new Schema({
   // From XML -> Medical Plan Key
@@ -22,6 +23,14 @@ var planSchema = new Schema({
 
   // System
   time_stamp: { type: Date, default: Date.now }
+});
+
+planSchema.plugin(searchable, {
+  paths: [
+    'legacyKey',
+    'legacyDescription',
+    'name'
+  ]
 });
 
 module.exports = createModel('MedicalPlan', planSchema);

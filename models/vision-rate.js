@@ -7,7 +7,8 @@
 var mongoose = require('mongoose'),
     Schema   = mongoose.Schema;
 
-var createModel = require('./helpers/create-model');
+var createModel = require('./helpers/create-model'),
+    searchable  = require('./plugins/searchable');
 
 var rateSchema = new Schema({
   // From XML -> VisionRate
@@ -26,6 +27,14 @@ var rateSchema = new Schema({
 
   // System
   time_stamp: { type: Date, default: Date.now }
+});
+
+rateSchema.plugin(searchable, {
+  paths: [
+    'planNumber',
+    'name',
+    'deductible'
+  ]
 });
 
 module.exports = createModel('VisionRate', rateSchema);
