@@ -85,6 +85,8 @@ exports.update = function ( req, res, next ) {
     }
 
     record.permissions = payload.permissions;
+    record.endpoints   = payload.endpoints;
+    record.name        = payload.name;
 
     delete payload.permissions;
     delete payload._id;
