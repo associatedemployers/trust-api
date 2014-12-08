@@ -38,6 +38,7 @@ exports.fetchAll = function ( req, res, next ) {
 
   for ( var key in query ) {
     var v = query[ key ];
+
     if( v === 'exists' ) {
       query[ key ] = {
         $exists: true
@@ -46,10 +47,14 @@ exports.fetchAll = function ( req, res, next ) {
       query[ key ] = {
         $exists: false
       };
+    } else if ( v === 'false' ) {
+      query[ key ] = false;
+    } else if( v === 'true' ) {
+      query[ key ] = true;
     }
   }
 
-  console.log(query, limit, page, skip);
+  console.log(query, select, limit, page, skip);
 
   Employee
   .find( query )

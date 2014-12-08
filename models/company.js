@@ -66,6 +66,7 @@ var companySchema = new Schema({
 
   legacyCompEffectDate:   Date,
   legacyBrokerEffectDate: Date,
+  removedOn:              Date,
 
   // System
   time_stamp: { type: Date, default: Date.now }

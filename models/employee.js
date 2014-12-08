@@ -116,8 +116,8 @@ var employeeSchema = new Schema({
   },
 
   // System DTs
-  legacyClientEmploymentDate:  Date,
-  legacyClientTerminationDate: Date,
+  legacyClientEmploymentDate:  { type: Date, index: true },
+  legacyClientTerminationDate: { type: Date, index: true },
   legacyInitialDateSent:       Date,
   legacyChangeSent:            Date,
   legacyTerminationSent:       Date,
