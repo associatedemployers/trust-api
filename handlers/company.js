@@ -7,7 +7,6 @@ var Company       = require('../models/company'),
     ResourceMixin = require('../lib/mixins/resource-handler');
 
 exports.fetchAll = ResourceMixin.getAll('Company');
-
 exports.fetchByID = ResourceMixin.getById('Company');
 
 exports.create = function ( req, res, next ) {
