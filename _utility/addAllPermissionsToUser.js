@@ -1,4 +1,4 @@
-function addAllTo ( userId ) {
+module.exports = function ( userId ) {
   var cwd = process.cwd() + '/';
   var PermissionGroup = require(cwd + 'models/permission-group'),
       UserPermission  = require(cwd + 'models/user-permission'),
@@ -41,4 +41,4 @@ function addAllTo ( userId ) {
       });
     });
   });
-}
+};
