@@ -69,7 +69,7 @@ var companySchema = new Schema({
   removedOn:              Date,
 
   // System
-  time_stamp: { type: Date, default: Date.now }
+  time_stamp: { type: Date, default: Date.now, index: true }
 });
 
 companySchema = ticker

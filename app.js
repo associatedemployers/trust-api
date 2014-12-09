@@ -47,14 +47,10 @@ exports.init = function ( app ) {
     route(app);
   });
 
-  registerModels();
-
   return app;
 };
 
-exports.registerModels = registerModels;
-
-function registerModels () {
+exports.registerModels = function () {
   winston.debug(chalk.dim('Registering models...'));
   globSync('./models/**/*.js').map(require);
-}
+};

@@ -4,102 +4,13 @@ var winston   = require('winston').loggers.get('default'),
     respond   = require('./response'),
     _         = require('lodash');
 
-var Employee    = require('../models/employee'),
-    Company     = require('../models/company'),
-    MedicalRate = require('../models/medical-rate');
+var Employee      = require('../models/employee'),
+    Company       = require('../models/company'),
+    MedicalRate   = require('../models/medical-rate'),
+    ResourceMixin = require('../lib/mixins/resource-handler');
 
-exports.fetchAll = function ( req, res, next ) {
-  console.log(req.query);
-  var query  = req.query,
-      limit  = parseFloat(query.limit) || null,
-      page   = parseFloat(query.page)  || 0,
-      select = query.select || '',
-      skip   = page * limit,
-      sort   = query.sort || { time_stamp: 1 };
-
-  if( query._distinct === 'true' ) {
-    return Employee.distinct({}, select).exec().then(function ( items ) {
-      res.send( items );
-    });
-  }
-
-  if( req.query.ids ) {
-    query._id = {
-      $in: req.query.ids
-    };
-
-    delete query.ids;
-  }
-
-  delete query.limit;
-  delete query.page;
-  delete query.sort;
-  delete query.select;
-
-  for ( var key in query ) {
-    var v = query[ key ];
-
-    if( v === 'exists' ) {
-      query[ key ] = {
-        $exists: true
-      };
-    } else if ( v === 'nexists' ) {
-      query[ key ] = {
-        $exists: false
-      };
-    } else if ( v === 'false' ) {
-      query[ key ] = false;
-    } else if( v === 'true' ) {
-      query[ key ] = true;
-    }
-  }
-
-  console.log(query, select, limit, page, skip);
-
-  Employee
-  .find( query )
-  .sort( sort )
-  .skip( Math.abs( skip ) )
-  .limit( Math.abs( limit ) )
-  .select( select )
-  .populate('plans.medical plans.dental plans.vision plans.life')
-  .exec(function ( err, records ) {
-    if( err ) {
-      return respond.error.res( res, err, true );
-    }
-
-    Employee.count( query, function ( err, count ) {
-      if( err ) {
-        return respond.error.res( res, err, true );
-      }
-
-      res.json( normalize.employee( records, { totalRecords: count } ) );
-    });
-  });
-};
-
-exports.fetchByID = function ( req, res, next ) {
-  var id = req.params.id;
-
-  if( !id ) {
-    return respond.error.res( res, 'Please specify an id in the url.' );
-  }
-
-  Employee
-  .findById(id)
-  .populate('plans.medical plans.dental plans.vision plans.life')
-  .exec(function ( err, record ) {
-    if( err ) {
-      return respond.error.res( res, err, true );
-    }
-
-    if( !record ) {
-      return respond.code.notfound( res );
-    }
-
-    res.json( normalize.employee( record ) );
-  });
-};
+exports.fetchAll = ResourceMixin.getAll('Employee', 'plans.medical plans.dental plans.vision plans.life');
+exports.fetchByID = ResourceMixin.getById('Employee', 'plans.medical plans.dental plans.vision plans.life');
 
 exports.create = function ( req, res, next ) {
   respond.code.notimplemented(res);

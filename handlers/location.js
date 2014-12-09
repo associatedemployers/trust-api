@@ -3,11 +3,12 @@ var winston   = require('winston').loggers.get('default'),
     normalize = require('../config/data-normalization'),
     respond   = require('./response');
 
-var MedicalPlan   = require('../models/medical-plan'),
+var Company       = require('../models/company'),
     ResourceMixin = require('../lib/mixins/resource-handler');
 
-exports.fetchAll = ResourceMixin.getAll('MedicalPlan');
-exports.fetchByID = ResourceMixin.getById('MedicalPlan');
+exports.fetchAll = ResourceMixin.getAll('Location');
+
+exports.fetchByID = ResourceMixin.getById('Location');
 
 exports.create = function ( req, res, next ) {
   respond.code.notimplemented(res);
