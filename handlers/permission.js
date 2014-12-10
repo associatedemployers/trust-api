@@ -71,11 +71,11 @@ exports.update = function ( req, res, next ) {
     return respond.error.res(res, 'Provide a payload with your request, prefixed with the type');
   }
 
-  if( !payload._id ) {
+  if( !req.params._id ) {
     return respond.error.res(res, 'Missing information to complete request');
   }
 
-  PermissionGroup.findById( payload._id ).exec(function ( err, record ) {
+  PermissionGroup.findById( req.params._id ).exec(function ( err, record ) {
     if( err ) {
       return respond.error.res(res, err, true);
     }
