@@ -104,8 +104,6 @@ describe('Route :: Users', function () {
             session.create( user._id, {}, 'Session' ).then(function ( userSession ) {
               _token = userSession.publicKey;
               done();
-            }).catch(function ( err ) {
-              return respond.error.res( res, err, true );
             });
           });
         });
@@ -201,6 +199,30 @@ describe('Route :: Users', function () {
             });
         });
 
+        it('should reject creation of super users by users that are not super', function ( done ) {
+          chai.request(app)
+            .post('/api/users/')
+            .set('X-API-Token', _token)
+            .send({
+              user: {
+                login: {
+                  email: 'test@email.com'
+                },
+                name: {
+                  first: 'test',
+                  last: 'user'
+                },
+                super: true
+              }
+            })
+            .then(function ( res ) {
+              expect(res).to.have.status(401);
+              expect(res.error.text.toLowerCase()).to.contain('cannot').and.to.contain('super');
+
+              done();
+            });
+        });
+
         it('should reject duplicates', function ( done ) {
           chai.request(app)
             .post('/api/users/')
@@ -249,6 +271,67 @@ describe('Route :: Users', function () {
               done();
             });
         });
+
+        it('should reject updating to super without super status', function ( done ) {
+          var user = new User({
+            login: {
+              email: 'my@test.user2'
+            },
+            name: {
+              first: 'test',
+              last: 'user'
+            }
+          });
+
+          user.save(function ( err, usr ) {
+            if( err ) throw err;
+            chai.request(app)
+              .put('/api/users/' + usr._id.toString())
+              .set('X-API-Token', _token)
+              .send({
+                user: {
+                  super: true
+                }
+              })
+              .then(function ( res ) {
+                expect(res).to.have.status(401);
+                expect(res.error.text.toLowerCase()).to.contain('cannot').and.to.contain('super');
+
+                done();
+              });
+          });
+        });
+
+        it('should reject downgrading of super users', function ( done ) {
+          var user = new User({
+            login: {
+              email: 'my@test.user3'
+            },
+            name: {
+              first: 'test',
+              last: 'user'
+            },
+            super: true
+          });
+
+          user.save(function ( err, usr ) {
+            if( err ) throw err;
+            chai.request(app)
+              .put('/api/users/' + usr._id.toString())
+              .set('X-API-Token', _token)
+              .send({
+                user: {
+                  super: false
+                }
+              })
+              .then(function ( res ) {
+                expect(res).to.have.status(400);
+                expect(res.error.text.toLowerCase()).to.contain('cannot').and.to.contain('super');
+
+                done();
+              });
+          });
+        });
       });
 
       describe('DELETE /:id/', function () {
@@ -260,6 +343,39 @@ describe('Route :: Users', function () {
               expect(res).to.have.status(404);
               done();
             });
+        });
+
+        it('should reject deletion of super users', function ( done ) {
+          var user = new User({
+            login: {
+              email: 'my@test.user'
+            },
+            name: {
+              first: 'test',
+              last: 'user'
+            },
+            super: true
+          });
+
+          user.save(function ( err, usr ) {
+            if( err ) throw err;
+
+            chai.request(app)
+              .delete('/api/users/' + usr._id.toString())
+              .set('X-API-Token', _token)
+              .then(function ( res ) {
+                expect(res).to.have.status(401);
+                expect(res.error.text.toLowerCase())
+                  .to.contain('cannot')
+                  .and.to.contain('super');
+
+                User.findById(usr._id, function ( err, foundUser ) {
+                  if( err ) throw err;
+                  expect(foundUser).to.exist;
+                  done();
+                });
+              });
+          });
         });
       });
     });
@@ -279,7 +395,7 @@ describe('Route :: Users', function () {
           });
         });
 
-        it('should retrieve all', function (done) {
+        it('should retrieve all', function ( done ) {
           chai.request(app)
             .get('/api/users/')
             .set('X-API-Token', _token)
