@@ -61,7 +61,8 @@ exports.create = function ( req, res, next ) {
 };
 
 exports.update = function ( req, res, next ) {
-  var payload = req.body.permissionGroup;
+  var payload = req.body.permissionGroup,
+      id      = req.params.id;
 
   if( !req.session.user.super ) {
     return res.status(401).send('Users without "super" status are not allowed to edit permissions');
@@ -71,11 +72,11 @@ exports.update = function ( req, res, next ) {
     return respond.error.res(res, 'Provide a payload with your request, prefixed with the type');
   }
 
-  if( !req.params._id ) {
+  if( !id ) {
     return respond.error.res(res, 'Missing information to complete request');
   }
 
-  PermissionGroup.findById( req.params._id ).exec(function ( err, record ) {
+  PermissionGroup.findById( id ).exec(function ( err, record ) {
     if( err ) {
       return respond.error.res(res, err, true);
     }
