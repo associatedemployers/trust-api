@@ -22,6 +22,10 @@ exports.create = function ( req, res, next ) {
     return respond.error.res(res, 'Incomplete payload');
   }
 
+  if( payload.super && !req.session.user.super ) {
+    return res.status(401).send('You cannot create a super user without being a super user');
+  }
+
   delete payload._id;
 
   User.findOne({ 'login.email': payload.login.email }).exec(function ( err, user ) {
@@ -60,6 +64,14 @@ exports.update = function ( req, res, next ) {
       return respond.error.res( res, err, true );
     }
 
+    if( record.super && !req.session.user.super ) {
+      return res.status(401).send('You cannot update a super user without being a super user');
+    } else if( record.super && payload.super === false ) {
+      return res.status(400).send('You cannot downgrade a super user.');
+    } else if( !record.super && payload.super === true && !req.session.user.super ) {
+      return res.status(401).send('You cannot upgrade a user to super without being a super user');
+    }
+
     // Read-only Properties
     delete payload._id;
 
@@ -91,15 +103,25 @@ exports.del = function ( req, res, next ) {
     return respond.error.res( res, 'Please provide an id with your DELETE request' );
   }
 
-  User
-  .findByIdAndRemove( id )
-  .exec(function ( err, record ) {
+  User.findById(id, function ( err, record ) {
     if( err ) {
-      return respond.error.res( res, err, true );
+      return respond.error.res(res, err, true);
     }
 
-    res.status(200).send({
-      user: record
-    });
+    if( record.super ) {
+      return res.status(401).send('You cannot delete super users');
+    }
+
+    User
+      .findByIdAndRemove( id )
+      .exec(function ( err, record ) {
+        if( err ) {
+          return respond.error.res(res, err, true);
+        }
+
+        res.status(200).send({
+          user: record
+        });
+      });
   });
 };

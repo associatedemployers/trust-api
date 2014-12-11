@@ -325,7 +325,7 @@ describe('Route :: Users', function () {
                 }
               })
               .then(function ( res ) {
-                expect(res).to.have.status(400);
+                expect(res).to.have.status(401);
                 expect(res.error.text.toLowerCase()).to.contain('cannot').and.to.contain('super');
 
                 done();
