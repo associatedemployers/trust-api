@@ -15,12 +15,16 @@ exports.create = function ( req, res, next ) {
   var payload = req.body.user;
 
   if( !payload ) {
-    return respond.error.res( res, 'Provide a payload with your request, prefixed with the type' );
+    return respond.error.res(res, 'Provide a payload with your request, prefixed with the type');
+  }
+
+  if( !payload.login || !payload.login.email || !payload.name || !payload.name.first || !payload.name.last ) {
+    return respond.error.res(res, 'Incomplete payload');
   }
 
   delete payload._id;
 
-  User.findOne({ email: payload.email }).exec(function ( err, user ) {
+  User.findOne({ 'login.email': payload.login.email }).exec(function ( err, user ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
@@ -42,24 +46,21 @@ exports.create = function ( req, res, next ) {
 };
 
 exports.update = function ( req, res, next ) {
-  var payload = req.body.user;
+  var payload = req.body.user,
+      id      = req.params.id;
 
   if( !payload ) {
     return respond.error.res( res, 'Provide a payload with your request, prefixed with the type' );
   }
 
-  if( !payload._id ) {
-    return respond.error.res( res, 'Please provide an id with your UPDATE/PUT request' );
-  }
-
   User
-  .findById( payload._id )
+  .findById( id )
   .exec(function ( err, record ) {
     if( err ) {
       return respond.error.res( res, err, true );
     }
 
-    // Read-only
+    // Read-only Properties
     delete payload._id;
 
     // Merge the payload
@@ -97,6 +98,8 @@ exports.del = function ( req, res, next ) {
       return respond.error.res( res, err, true );
     }
 
-    res.status(200).send( record );
+    res.status(200).send({
+      user: record
+    });
   });
 };
