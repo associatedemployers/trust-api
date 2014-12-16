@@ -32,6 +32,8 @@ exports.login = function ( req, res, next ) {
       return res.status(401).send('No user exists with that email.');
     }
 
+    console.log(payload.password);
+
     bcp.compare(payload.password, user.login.password, function ( err, isSame ) {
       if( err ) {
         return respond.error.res( res, err, true );

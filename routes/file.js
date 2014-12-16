@@ -1,8 +1,14 @@
 var express     = require('express'),
     fileHandler = require('../handlers/file');
 
+var sessionMiddleware       = require('../lib/security/middleware/session'),
+    authorizationMiddleware = require('../lib/security/middleware/authorization');
+
 module.exports = function ( app ) {
   var fileRouter = express.Router();
+
+  fileRouter.use( sessionMiddleware('Session') );
+  fileRouter.use( authorizationMiddleware({ allow: 'admin' }) );
 
   fileRouter.get('/', fileHandler.fetchAll);
   fileRouter.get('/:id', fileHandler.fetchByID);
