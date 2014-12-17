@@ -26,7 +26,9 @@ describe('SchemaPlugin :: Searchable', function () {
       tags:    Array,
       notes: [{
         text: String
-      }]
+      }],
+      testObj: {},
+      testArr: []
     });
 
     done();
@@ -48,7 +50,9 @@ describe('SchemaPlugin :: Searchable', function () {
         'name.first',
         'name.last',
         'tags',
-        'notes.$.text'
+        'notes.$.text',
+        'testObj',
+        'testArr'
       ]
     });
 
@@ -56,8 +60,7 @@ describe('SchemaPlugin :: Searchable', function () {
 
     var testRecord = new testModel({
       name: {
-        first: 'morgan',
-        last:  'Freeman'
+        first: 'morgan'
       },
       email: 'morgan@deepvoice.com',
       tags: [ 'awesome' ],
@@ -75,10 +78,11 @@ describe('SchemaPlugin :: Searchable', function () {
 
       expect(doc.stringified)
         .to.contain('morgan')
-        .and.to.contain('Freeman')
         .and.to.contain('awesome')
         .and.to.contain('I am nested.')
-        .and.to.not.contain('morgan@deepvoice.com');
+        .and.to.not.contain('morgan@deepvoice.com')
+        .and.to.not.contain('Freeman')
+        .and.to.not.contain('[object Object]', 'Undefined Fragments');
 
       doc.tags.push('I can smell you');
       doc.notes.push({
@@ -92,7 +96,6 @@ describe('SchemaPlugin :: Searchable', function () {
 
         expect(doc.stringified)
           .to.contain('morgan')
-          .and.to.contain('Freeman')
           .and.to.contain('Really')
           .and.to.contain('I can smell you');
 

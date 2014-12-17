@@ -23,7 +23,8 @@ function Searchable ( schema, options ) {
     options.paths.forEach(function ( path ) {
       var v = getPath.call( plain, path ),
           s = ( _.isArray( v ) ) ? v.join(' ') : v;
-      str.push(s);
+
+      if( !_.isUndefined(s) && !_.isEmpty(s) ) str.push(s);
     });
 
     this.stringified = str.join(' ');
