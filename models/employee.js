@@ -11,6 +11,8 @@ var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
     cryptify   = require('mongoose-cryptify'),
     searchable = require('./plugins/searchable');
 
+var MedicalPlan = require('./medical-plan');
+
 /*
   Subdoc Schemas
 */
@@ -100,7 +102,8 @@ var employeeSchema = new Schema({
   dependents: [{ type: mongoose.Schema.ObjectId, ref: 'Dependent' }],
   files:      [{ type: mongoose.Schema.ObjectId, ref: 'File' }],
 
-  // Plans
+  // Plan/Rates
+  medicalPlan: { type: mongoose.Schema.ObjectId, ref: 'MedicalPlan' },
   plans: {
     medical: [{ type: Schema.ObjectId, ref: 'MedicalRate' }],
     dental:  [{ type: Schema.ObjectId, ref: 'DentalRate' }],
@@ -126,6 +129,28 @@ var employeeSchema = new Schema({
   legacyCobraTerminationDate:  Date,
 
   time_stamp: { type: Date, default: Date.now, index: true }
+});
+
+employeeSchema.pre('save', function ( next ) {
+  var self = this;
+
+  this.constructor.populate(this, { path: 'plans.medical', select: 'plan' }).then(function ( populatedRecord ) {
+    var rate = populatedRecord.plans.medical[0];
+
+    if( !rate || !rate.plan ) {
+      return next();
+    }
+
+    MedicalPlan.findById(rate.plan, function ( err, plan ) {
+      if( err ) return next( err );
+
+      if( plan ) {
+        self.medicalPlan = plan._id;
+      }
+
+      next.call( self );
+    });
+  }, next); // Next will throw the error
 });
 
 employeeSchema = ticker

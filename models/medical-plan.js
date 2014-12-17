@@ -28,7 +28,6 @@ var planSchema = new Schema({
 planSchema.plugin(searchable, {
   paths: [
     'legacyKey',
-    'legacyDescription',
     'name'
   ]
 });
