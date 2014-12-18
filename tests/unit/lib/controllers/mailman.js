@@ -16,7 +16,7 @@ describe('Mailman', function () {
     expect(Mailman).to.be.a('function');
   });
 
-  (process.env.allow_test_sendmail === true ? it : it.skip)('should send an email', function ( done ) {
+  (process.env.allow_test_sendmail === "true" ? it : it.skip)('should send an email', function ( done ) {
     this.timeout(60000);
 
     var postalWorker = new Mailman(),

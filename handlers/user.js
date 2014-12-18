@@ -4,9 +4,11 @@ var winston   = require('winston').loggers.get('default'),
     respond   = require('./response'),
     _         = require('lodash');
 
-var User          = require('../models/user'),
-    ObjectId      = require('mongoose').Types.ObjectId,
-    ResourceMixin = require('../lib/mixins/resource-handler');
+var User           = require('../models/user'),
+    UserPermission = require('../models/user-permission'),
+    ObjectId       = require('mongoose').Types.ObjectId,
+    ResourceMixin  = require('../lib/mixins/resource-handler'),
+    Mailman        = require('../lib/controllers/mailman');
 
 exports.fetchAll = ResourceMixin.getAll('User');
 exports.fetchByID = ResourceMixin.getById('User');
@@ -119,8 +121,14 @@ exports.del = function ( req, res, next ) {
           return respond.error.res(res, err, true);
         }
 
-        res.status(200).send({
-          user: record
+        UserPermission.remove({ user: id }, function ( err ) {
+          if( err ) {
+            return respond.error.res(res, err, true);
+          }
+
+          res.status(200).send({
+            user: record
+          });
         });
       });
   });

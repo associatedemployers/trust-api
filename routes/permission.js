@@ -18,6 +18,8 @@ module.exports = function (app) {
   permissionRouter.put('/:id', permissionHandler.update);
   permissionRouter.delete('/:id', permissionHandler.del);
 
+  userPermissionRouter.get('/', userPermissionHandler.fetchAll);
+  userPermissionRouter.get('/:id', userPermissionHandler.fetchById);
   userPermissionRouter.post('/', userPermissionHandler.create);
   userPermissionRouter.put('/:id', userPermissionHandler.update);
 

@@ -5,7 +5,12 @@ var winston   = require('winston').loggers.get('default'),
     respond   = require('./response');
 
 var UserPermission  = require('../models/user-permission'),
+    User            = require('../models/user'),
+    ResourceMixin  = require('../lib/mixins/resource-handler'),
     PermissionGroup = require('../models/permission-group');
+
+exports.fetchAll = ResourceMixin.getAll('UserPermission');
+exports.fetchById = ResourceMixin.getById('UserPermission');
 
 exports.create = function ( req, res, next ) {
   var payload = req.body.userPermission,
@@ -27,15 +32,33 @@ exports.create = function ( req, res, next ) {
     return res.status(401).send('You cannot create userPermissions you do not have yourself.');
   }
 
-  var record = new UserPermission( payload );
-
-  record.save(function ( err, record ) {
+  User.findById(payload.user, function ( err, user ) {
     if( err ) {
       return respond.error.res(res, err, true);
     }
 
-    res.status(201).send({
-      userPermission: record
+    if( !user ) {
+      return respond.error.res(res, 'Could not find user' + payload.user);
+    }
+
+    var record = new UserPermission( payload );
+
+    record.save(function ( err, record ) {
+      if( err ) {
+        return respond.error.res(res, err, true);
+      }
+
+      user.permissions.push( record._id );
+
+      user.save(function ( err, userRecord ) {
+        if( err ) {
+          return respond.error.res(res, err, true);
+        }
+
+        res.status(201).send({
+          userPermission: record
+        });        
+      });
     });
   });
 };
