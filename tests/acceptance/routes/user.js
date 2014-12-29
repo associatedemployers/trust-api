@@ -454,7 +454,7 @@ describe('Route :: Users', function () {
       it('should update users', function ( done ) {
         var user = new User({
           login: {
-            email: 'my@test.user'
+            email: 'my@test.update'
           },
           name: {
             first: 'test',
@@ -507,7 +507,7 @@ describe('Route :: Users', function () {
       it('should delete users', function ( done ) {
         var user = new User({
           login: {
-            email: 'my@test.user'
+            email: 'my@test.del'
           },
           name: {
             first: 'test',
