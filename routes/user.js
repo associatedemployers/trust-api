@@ -1,6 +1,7 @@
-var express      = require('express'),
-    userHandler  = require('../handlers/user'),
-    loginHandler = require('../handlers/login');
+var express            = require('express'),
+    userHandler        = require('../handlers/user'),
+    userUtilityHandler = require('../handlers/user-utilities'),
+    loginHandler       = require('../handlers/login');
 
 var sessionMiddleware       = require('../lib/security/middleware/session'),
     authorizationMiddleware = require('../lib/security/middleware/authorization');
@@ -19,6 +20,9 @@ module.exports = function ( app ) {
   userRouter.delete('/:id', userHandler.del);
 
   userUtilityRouter.post('/login', loginHandler.login);
+
+  userUtilityRouter.get('/verify/:id', userUtilityHandler.verifyLink);
+  userUtilityRouter.post('/verify/:id', userUtilityHandler.verifyAccount);
 
   app.use('/api/users', userRouter);
   app.use('/api/user', userUtilityRouter);

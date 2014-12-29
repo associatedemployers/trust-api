@@ -26,6 +26,7 @@ var userSchema = new Schema({
   super:         Boolean,
   receiveEmails: Boolean,
   apiAccess:     Boolean,
+  verified:      Boolean,
 
   permissions: [{ type: Schema.ObjectId, ref: 'UserPermission' }],
 
@@ -37,16 +38,20 @@ var Mailman = require('../lib/controllers/mailman'),
 
 // Hold isNew status for post hooks
 userSchema.pre('save', function ( next ) {
-  this.isNew_post = this.isNew;
+  this.isNew_post = this.verified = this.isNew;
   next();
 });
 
 // Async Mail Notification Middleware
 // ---
-// Sends user an email with MD5 link gen'd
+// Sends user an email with id link
 // from email so that we can set their password
 userSchema.post('save', function ( doc ) {
   if( !this.isNew_post || !this.login.email ) {
+    return;
+  }
+
+  if( process.env.environment === 'test' && ( process.env.allow_test_sendmail === 'false' || !process.env.allow_test_sendmail ) ) {
     return;
   }
 
