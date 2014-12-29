@@ -49,22 +49,15 @@ userSchema.post('save', function ( doc ) {
   if( !this.isNew_post || !this.login.email ) {
     return;
   }
-  console.log('is New Doc');
-  var mailer = new Mailman({
-    sender: {
-      email: 'no-reply@aetrust.org',
-      name:  'AE Trust'
-    }
-  });
-  console.log('created Mailman');
-  console.log('sending mail');
+
+  var mailer = new Mailman();
+
   mailer.send(this.login.email, 'Complete your Trust Administration account setup', 'admin-setup-account', {
     name: this.name,
     link: doc._id.toString()
-  }).then(function () {
-    console.log('sent mail');
   }).catch(function ( err ) {
-    console.log('there was an error', err);
+    winston.log('error', chalk.red('There was an error sending mail for user signup:', err));
+    throw err;
   });
 });
 
