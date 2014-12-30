@@ -26,7 +26,7 @@ var userSchema = new Schema({
   super:         Boolean,
   receiveEmails: Boolean,
   apiAccess:     Boolean,
-  verified:      Boolean,
+  verified:      { type: Boolean, default: false },
 
   permissions: [{ type: Schema.ObjectId, ref: 'UserPermission' }],
 

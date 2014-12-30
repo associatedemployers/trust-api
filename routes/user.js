@@ -21,8 +21,8 @@ module.exports = function ( app ) {
 
   userUtilityRouter.post('/login', loginHandler.login);
 
-  userUtilityRouter.get('/verify/:id', userUtilityHandler.verifyLink);
-  userUtilityRouter.post('/verify/:id', userUtilityHandler.verifyAccount);
+  userUtilityRouter.get('/verify/:id', userUtilityHandler.fetchId, userUtilityHandler.verifyLink);
+  userUtilityRouter.post('/verify/:id', userUtilityHandler.fetchId, userUtilityHandler.verifyAccount);
 
   app.use('/api/users', userRouter);
   app.use('/api/user', userUtilityRouter);
