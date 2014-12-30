@@ -21,7 +21,7 @@ exports.fetchId = function ( req, res, next ) {
       return respond.error.res(res, err, true);
     }
 
-    if( !user || ( user && user.verified === true ) ) {
+    if( !user || ( user && ( user.verified === true || user.login.password ) ) ) {
       return respond.code.notfound(res, 'Id not found or already verified');
     }
 
@@ -36,7 +36,7 @@ exports.verifyLink = function ( req, res, next ) {
 };
 
 exports.verifyAccount = function ( req, res, next ) {
-  var user = req.verifyUser,
+  var user     = req.verifyUser,
       password = req.body.password;
 
   if( !password ) {
