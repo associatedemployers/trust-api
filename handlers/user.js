@@ -76,6 +76,8 @@ exports.update = function ( req, res, next ) {
 
     // Read-only Properties
     delete payload._id;
+    delete payload.verified;
+    if( payload.login ) delete payload.login.password;
 
     // Merge the payload
     record = _.merge( record, payload );
