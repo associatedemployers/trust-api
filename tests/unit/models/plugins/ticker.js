@@ -195,13 +195,13 @@ describe('Ticker Core', function () {
                 var mungedDoc = doc.toObject(),
                     historyEv = doc.historyEvents[0];
 
-                delete mungedDoc.historyEvents;
+                mungedDoc.historyEvents = [];
                 delete mungedDoc.__v;
                 delete doc.historyEvents[0].documents.updated.__v;
 
                 expect(historyEv, 'doc[historyEvents][0]').to.have.property('time_stamp');
                 expect(historyEv.documents.updated).to.deep.equal(mungedDoc);
-                expect(historyEv.deltaTypes).to.have.members(['Deleted', 'Changed']);
+                expect(historyEv.deltaTypes).to.have.members(['Deleted', 'Edited']);
 
                 done();
               });
@@ -262,13 +262,13 @@ describe('Ticker Core', function () {
                   var mungedDoc = doc.toObject(),
                       historyEv = doc.historyEvents[0];
 
-                  delete mungedDoc.historyEvents;
+                  mungedDoc.historyEvents = [];
                   delete mungedDoc.__v;
                   delete doc.historyEvents[0].documents.updated.__v;
 
                   expect(historyEv, 'doc[historyEvents][0]').to.have.property('time_stamp');
                   expect(historyEv.documents.updated).to.deep.equal(mungedDoc);
-                  expect(historyEv.deltaTypes).to.have.members(['Deleted', 'Changed']);
+                  expect(historyEv.deltaTypes).to.have.members(['Deleted', 'Edited']);
 
                   next();
                 });
