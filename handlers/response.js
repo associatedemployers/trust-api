@@ -4,21 +4,23 @@
   Simplifies & standardizes responses
 */
 
-var logger = require('winston');
+var winston = require('winston'),
+    chalk   = require('chalk');
 
 exports.error = {
   res: function ( res, err, thr ) {
-    logger.log('debug', err);
+    winston.log('debug', err);
     
     if( thr ) {
       res.status(500).send( err );
+      winston.log('error', chalk.bgRed( err.stack || err ));
       throw new Error(err);
     } else {
       res.status(400).send( err );
     }
   },
   log: function ( err ) {
-    logger.log('error', err);
+    winston.log('error', err);
   }
 };
 
