@@ -16,7 +16,7 @@ var sessionSchema = new Schema({
   publicKey:  { type: String, index: true },
   privateKey: String,
 
-  user: { type: Schema.ObjectId, ref: 'User', index: true },
+  user: { type: Schema.ObjectId, index: true },
 
   expiration: { type: Date, default: expirationGen, index: true },
   created:    { type: Date, default: Date.now }
