@@ -11,7 +11,7 @@ var Employee     = require('../models/employee'),
     session      = require('../lib/security/session'),
     token        = require('../lib/security/token');
 
-var dataSignature = require(process.cwd() + '/config/keys').dataSignature,
+var dataSignature = ( process.env.environment === 'test' ) ? '12345678123456789' : require(process.cwd() + '/config/keys').dataSignature,
     encryptor     = require('simple-encryptor')(dataSignature);
 
 exports.login = function ( req, res, next ) {

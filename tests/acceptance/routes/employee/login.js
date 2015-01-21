@@ -27,7 +27,7 @@ var app      = require(cwd + '/app').init( require('express')() ),
     Employee = require(cwd + '/models/employee'),
     Company  = require(cwd + '/models/company');
 
-var dataSignature = require(process.cwd() + '/config/keys').dataSignature,
+var dataSignature = ( process.env.environment === 'test' ) ? '12345678123456789' : require(cwd + '/config/keys').dataSignature,
     encryptor     = require('simple-encryptor')(dataSignature);
 
 describe('Employee Route :: Login', function () {
