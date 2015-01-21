@@ -38,6 +38,11 @@ var beneficiarySchema = new Schema({
   time_stamp: { type: Date, default: Date.now }
 }, { _id: true });
 
+var loginSchema = new Schema({
+  ip: String,
+  time_stamp: { type: Date, default: Date.now }
+}, { _id: false });
+
 /*
   Doc Schema
 */
@@ -69,6 +74,7 @@ var employeeSchema = new Schema({
   memberId:            String, // 943 #
   ebmsTerminationCode: String,
   waived:              Boolean,
+  enrolled:            { type: Boolean, default: false },
 
   name: {
     first:         String,
@@ -89,8 +95,10 @@ var employeeSchema = new Schema({
   contactMethods: [ contactSchema ],
   beneficiaries:  [ beneficiarySchema ],
   notes:          [ noteSchema ],
+  logins:         [ loginSchema ],
 
   ssn:           String,
+  ssnDc:         Number, // Temporary field while enrolling to be able to find the record until memberid is gen'd
   gender:        String,
   maritalStatus: String,
 

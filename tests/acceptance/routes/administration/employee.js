@@ -79,8 +79,7 @@ describe('Route :: Employees', function () {
             throw err;
           }
 
-          var args = Array.prototype.slice.call(arguments, 0);
-          args.shift();
+          var args = Array.prototype.slice.call( arguments, 1 );
 
           _perms = args;
 
