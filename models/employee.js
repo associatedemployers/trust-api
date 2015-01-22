@@ -3,6 +3,7 @@
 */
 
 var mongoose = require('mongoose'),
+    Promise  = require('bluebird'), // jshint ignore:line
     Schema   = mongoose.Schema;
 
 var createModel = require('./helpers/create-model');
@@ -71,7 +72,7 @@ var employeeSchema = new Schema({
   legacyXVolVisionWaivedDependentName: String,
 
   ebmsNumber:          String,
-  memberId:            String, // 943 #
+  memberId:            Number, // 943 #
   ebmsTerminationCode: String,
   waived:              Boolean,
   enrolled:            { type: Boolean, default: false },
@@ -138,6 +139,30 @@ var employeeSchema = new Schema({
 
   time_stamp: { type: Date, default: Date.now, index: true }
 });
+
+/**
+ * Records a login to the document
+ * 
+ * @return {Object} Promise
+ */
+employeeSchema.methods.recordLogin = function ( ip, time ) {
+  var self = this;
+
+  return new Promise(function ( resolve, reject ) {
+    self.logins.push({
+      ip:         ip,
+      time_stamp: time
+    });
+
+    self.save(function ( err, result ) {
+      if ( err ) {
+        return reject( err );
+      }
+
+      resolve( result.logins );
+    });
+  });
+};
 
 employeeSchema.pre('save', function ( next ) {
   var self = this;

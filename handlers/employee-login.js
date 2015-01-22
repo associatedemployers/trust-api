@@ -4,6 +4,7 @@ var winston   = require('winston'),
     respond   = require('./response'),
     Promise   = require('bluebird'), // jshint ignore:line
     bcp       = require('bcrypt'),
+    jwt       = require('jwt-simple'),
     _         = require('lodash');
 
 var Employee     = require('../models/employee'),
@@ -28,8 +29,8 @@ exports.login = function ( req, res, next ) {
 
   var foundEmployee = function ( employee ) {
     _generateAuthorization( employee )
-    .then( _respondWithAuthorization.bind( res ) )
-    .catch( handleError );
+      .then( _respondWithAuthorization.bind( res ) )
+      .catch( handleError );
   };
 
   Employee.findOne({ ssnDc: ssn, enrolled: { $ne: true } }).exec().then(function ( employee ) {
@@ -60,7 +61,44 @@ exports.login = function ( req, res, next ) {
 };
 
 exports.verify = function ( req, res, next ) {
+  var payload  = req.body,
+      token    = payload.token,
+      memberId = payload.memberId;
 
+  if ( !token || !memberId || isNaN(memberId) || memberId.toString().length !== 9 ) {
+    return respond.error.res(res, 'Provide a payload in your request with a verification token and memberId');
+  }
+
+  var handleError = function ( err ) {
+    respond.error.res(res, err, true);
+  };
+
+  Verification.findOne({ publicKey: token, expiration: { $gt: Date.now() } }).exec().then(function ( verification ) {
+    if ( !verification ) {
+      return respond.code.notfound(res, 'Verification token not found or expired.');
+    }
+
+    var _decodedVerification = jwt.decode(verification.publicKey, verification.privateKey);
+
+    return Employee.findOne({ memberId: memberId }).exec().then(function ( employee ) {
+      if ( !employee ) {
+        return respond.code.notfound(res, 'Employee with that memberId not found');
+      }
+
+      if ( encryptor.decrypt(employee.ssn) !== _decodedVerification.ssn ) {
+        return respond.code.unauthorized(res, 'Incorrect SSN provided in verification');
+      }
+
+      _generateAuthorization( employee )
+        .then(function ( auth ) {
+          return employee.recordLogin(req.ip).then(function ( /* logins */ ) {
+            return auth;
+          });
+        })
+        .then( _respondWithAuthorization.bind( res ) )
+        .catch( handleError );
+    });
+  }).onReject( handleError );
 };
 
 /**

@@ -21,11 +21,13 @@ plugins.map(function ( plugin ) {
 
 chai.request.addPromises(Promise);
 
-var app      = require(cwd + '/app').init( require('express')() ),
-    session  = require(cwd + '/lib/security/session'),
-    mongoose = require('mongoose'),
-    Employee = require(cwd + '/models/employee'),
-    Company  = require(cwd + '/models/company');
+var app          = require(cwd + '/app').init( require('express')() ),
+    session      = require(cwd + '/lib/security/session'),
+    mongoose     = require('mongoose'),
+    Employee     = require(cwd + '/models/employee'),
+    Company      = require(cwd + '/models/company'),
+    Verification = require(cwd + '/models/verification'),
+    tokenModule  = require(cwd + '/lib/security/token');
 
 var dataSignature = ( process.env.environment === 'test' ) ? '12345678123456789' : require(cwd + '/config/keys').dataSignature,
     encryptor     = require('simple-encryptor')(dataSignature);
@@ -70,6 +72,7 @@ describe('Employee Route :: Login', function () {
         {
           _id:      company.employees[ 1 ],
           company:  company._id,
+          memberId: 943000000,
           ssn:      encryptor.encrypt(222111223),
           enrolled: true,
           name: {
@@ -178,6 +181,133 @@ describe('Employee Route :: Login', function () {
   });
 
   describe('Verification (Stage 2)', function () {
-    // TODO: Verification Tests
+    var _verification;
+
+    beforeEach(function ( done ) {
+      var verification = new Verification(tokenModule.createKeypair({
+        ssn: 222111224
+      }));
+
+      verification.save(function ( err, v ) {
+        if ( err ) throw err;
+
+        _verification = v;
+        done();
+      });
+    });
+
+    it('should reject empty requests', function ( done ) {
+      chai.request(app)
+        .post('/api/employee/login/verify')
+        .then(function ( res ) {
+          expect(res).to.have.status(400);
+          expect(res.error.text.toLowerCase()).to.contain('provide');
+
+          done();
+        });
+    });
+
+    it('should 404 verifications not found', function ( done ) {
+      chai.request(app)
+        .post('/api/employee/login/verify')
+        .send({
+          token:    "ABCDEFG123456789",
+          memberId: 943123123
+        })
+        .then(function ( res ) {
+          expect(res).to.have.status(404);
+          expect(res.error.text.toLowerCase()).to.contain('not found');
+
+          done();
+        });
+    });
+
+    it('should 404 expired verifications', function ( done ) {
+      _verification.expiration = Date.now();
+
+      _verification.save(function ( err, __verification ) {
+        if ( err ) throw err;
+
+        chai.request(app)
+          .post('/api/employee/login/verify')
+          .send({
+            token:    __verification.publicKey,
+            memberId: 943123123
+          })
+          .then(function ( res ) {
+            expect(res).to.have.status(404);
+            expect(res.error.text.toLowerCase()).to.contain('expired');
+
+            done();
+          });
+      });
+    });
+
+    it('should reject verification requests with no memberId found', function ( done ) {
+      chai.request(app)
+        .post('/api/employee/login/verify')
+        .send({
+          token:    _verification.publicKey,
+          memberId: 943111111
+        })
+        .then(function ( res ) {
+          expect(res).to.have.status(404);
+          expect(res.error.text.toLowerCase()).to.contain('memberid');
+
+          done();
+        });
+    });
+
+    it('should reject verification requests with wrong ssn', function ( done ) {
+      chai.request(app)
+        .post('/api/employee/login/verify')
+        .send({
+          token:    _verification.publicKey,
+          memberId: 943000000
+        })
+        .then(function ( res ) {
+          expect(res).to.have.status(401);
+          expect(res.error.text.toLowerCase()).to.contain('incorrect ssn');
+
+          done();
+        });
+    });
+
+    it('should return an authorization and record a log in when memberId & ssn matches', function ( done ) {
+      var verification = new Verification(tokenModule.createKeypair({
+        ssn: 222111223
+      }));
+
+      verification.save(function ( err, v ) {
+        if ( err ) throw err;
+
+        chai.request(app)
+          .post('/api/employee/login/verify')
+          .send({
+            token:    v.publicKey,
+            memberId: 943000000
+          })
+          .then(function ( res ) {
+            var body = res.body;
+
+            expect(res).to.have.status(200);
+            expect(body.verificationRequired).to.equal(false);
+            expect(body.token).to.exist;
+            expect(body.user).to.equal(_testEmployees[1]._id.toString());
+            expect(moment(body.expiration).isValid()).to.be.ok;
+
+            Employee.findById(_testEmployees[1]._id, function ( err, employee ) {
+              if ( err ) throw err;
+
+              expect(employee.logins.length).to.equal(1);
+              expect(employee.logins[0].ip).to.equal('127.0.0.1');
+              expect(employee.logins[0].time_stamp).to.exist;
+
+              done();
+            });
+          });
+      });
+    });
+
   });
 });
