@@ -85,7 +85,7 @@ exports.verify = function ( req, res, next ) {
         return respond.code.notfound(res, 'Employee with that memberId not found');
       }
 
-      if ( encryptor.decrypt(employee.ssn) !== _decodedVerification.ssn ) {
+      if ( encryptor.decrypt(employee.ssn) !== parseFloat(_decodedVerification.ssn) ) {
         return respond.code.unauthorized(res, 'Incorrect SSN provided in verification');
       }
 

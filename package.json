@@ -34,6 +34,7 @@
     "keygenerator": "^1.0.2",
     "less": "^1.7.4",
     "lodash": "^2.4.1",
+    "minimist": "^1.1.0",
     "moment": "^2.8.3",
     "mongoose": "^3.8.19",
     "mongoose-auto-increment": "^3.2.0",

@@ -291,7 +291,6 @@ describe('Employee Route :: Login', function () {
             var body = res.body;
 
             expect(res).to.have.status(200);
-            expect(body.verificationRequired).to.equal(false);
             expect(body.token).to.exist;
             expect(body.user).to.equal(_testEmployees[1]._id.toString());
             expect(moment(body.expiration).isValid()).to.be.ok;

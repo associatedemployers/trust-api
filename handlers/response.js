@@ -26,21 +26,12 @@ exports.error = {
 
 exports.code = {
   unauthorized: function ( res, msg ) {
-    res.status(401).json({
-      status: 'Unauthorized',
-      error: msg || 'You are not authorized to access that resource.'
-    });
+    res.status(401).send( msg || 'You are not authorized to access that resource.' );
   },
   notfound: function ( res, msg ) {
-    res.status(404).json({
-      status: 'Not Found',
-      error: msg || 'That resource was not found or is unavailable.'
-    });
+    res.status(404).send( msg || 'That resource was not found or is unavailable.' );
   },
   notimplemented: function ( res, msg ) {
-    res.status(501).json({
-      status: 'Not Implemented',
-      error: msg || 'This route has not been implemented yet.'
-    });
+    res.status(501).send( msg || 'This route has not been implemented yet.' );
   }
 };
