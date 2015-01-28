@@ -40,7 +40,7 @@ exports.login = function ( req, res, next ) {
       Employee.find({
         logins: {
           $elemMatch: {
-            ip: req.ip
+            ip: req.ip.replace('::ffff:', '')
           }
         }
       }).exec().then(function ( employeesByIp ) {
@@ -92,7 +92,7 @@ exports.verify = function ( req, res, next ) {
       _generateAuthorization( employee )
         .then(function ( auth ) {
           if ( req.ip ) {
-            return employee.recordLogin(req.ip.replace(':ffff:', '')).then(function ( /* logins */ ) {
+            return employee.recordLogin(req.ip.replace('::ffff:', '')).then(function ( /* logins */ ) {
               return auth;
             });
           } else {
