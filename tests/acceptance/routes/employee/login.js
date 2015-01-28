@@ -299,7 +299,7 @@ describe('Employee Route :: Login', function () {
               if ( err ) throw err;
 
               expect(employee.logins.length).to.equal(1);
-              expect(employee.logins[0].ip).to.equal('127.0.0.1');
+              expect(employee.logins[0].ip).to.contain('127.0.0.1');
               expect(employee.logins[0].time_stamp).to.exist;
 
               done();
