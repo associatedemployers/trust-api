@@ -302,7 +302,13 @@ describe('Employee Route :: Login', function () {
               expect(employee.logins[0].ip).to.contain('127.0.0.1');
               expect(employee.logins[0].time_stamp).to.exist;
 
-              done();
+              Verification.findOne({ publicKey: v.publicKey }, function ( err, existingVerification ) {
+                if ( err ) throw err;
+
+                expect( existingVerification ).to.not.exist;
+
+                done();
+              });
             });
           });
       });

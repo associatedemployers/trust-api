@@ -45,7 +45,7 @@ exports.login = function ( req, res, next ) {
         }
       }).exec().then(function ( employeesByIp ) {
         var ssnMatch = _.find(employeesByIp, function ( record ) {
-          return ( record.ssn ) ? encryptor.decrypt( record.ssn ) === ssn : false;
+          return ( record.ssn ) ? encryptor.decrypt( record.ssn ) === parseFloat( ssn ) : false;
         });
 
         return ( ssnMatch ) ? foundEmployee( ssnMatch ) : _generateVerificationToken(ssn).then(function ( verification ) {
@@ -89,7 +89,12 @@ exports.verify = function ( req, res, next ) {
         return respond.code.unauthorized(res, 'Incorrect SSN provided in verification');
       }
 
-      _generateAuthorization( employee )
+      verification.remove(function ( err ) {
+        if ( err ) {
+          handleError( err );
+        }
+
+        _generateAuthorization( employee )
         .then(function ( auth ) {
           if ( req.ip ) {
             return employee.recordLogin(req.ip.replace('::ffff:', '')).then(function ( /* logins */ ) {
@@ -101,6 +106,7 @@ exports.verify = function ( req, res, next ) {
         })
         .then( _respondWithAuthorization.bind( res ) )
         .catch( handleError );
+      });
     });
   }).onReject( handleError );
 };
