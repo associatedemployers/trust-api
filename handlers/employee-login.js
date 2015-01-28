@@ -91,7 +91,7 @@ exports.verify = function ( req, res, next ) {
 
       _generateAuthorization( employee )
         .then(function ( auth ) {
-          return employee.recordLogin(req.ip).then(function ( /* logins */ ) {
+          return employee.recordLogin(req.ip.replace(':ffff:')).then(function ( /* logins */ ) {
             return auth;
           });
         })
