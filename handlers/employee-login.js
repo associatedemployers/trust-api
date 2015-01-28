@@ -91,9 +91,13 @@ exports.verify = function ( req, res, next ) {
 
       _generateAuthorization( employee )
         .then(function ( auth ) {
-          return employee.recordLogin(req.ip.replace(':ffff:')).then(function ( /* logins */ ) {
+          if ( req.ip ) {
+            return employee.recordLogin(req.ip.replace(':ffff:', '')).then(function ( /* logins */ ) {
+              return auth;
+            });
+          } else {
             return auth;
-          });
+          }
         })
         .then( _respondWithAuthorization.bind( res ) )
         .catch( handleError );
