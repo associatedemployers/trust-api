@@ -112,7 +112,7 @@ describe('Employee Route :: Login', function () {
 
     it('should reject empty requests', function ( done ) {
       chai.request(app)
-        .post('/api/employee/login')
+        .post('/client-api/employee/login')
         .then(function ( res ) {
           expect(res).to.have.status(400);
           expect(res.error.text.toLowerCase()).to.contain('provide');
@@ -123,7 +123,7 @@ describe('Employee Route :: Login', function () {
 
     it('should send back verification token for ssn not found', function ( done ) {
       chai.request(app)
-        .post('/api/employee/login')
+        .post('/client-api/employee/login')
         .send({
           ssn: 123456789
         })
@@ -142,7 +142,7 @@ describe('Employee Route :: Login', function () {
 
     it('should send back an authorization for ssn found', function ( done ) {
       chai.request(app)
-        .post('/api/employee/login')
+        .post('/client-api/employee/login')
         .send({
           ssn: 222111224
         })
@@ -161,7 +161,7 @@ describe('Employee Route :: Login', function () {
 
     it('should send back an authorization for previous log in', function ( done ) {
       chai.request(app)
-        .post('/api/employee/login')
+        .post('/client-api/employee/login')
         .send({
           ssn: 222111222
         })
@@ -198,7 +198,7 @@ describe('Employee Route :: Login', function () {
 
     it('should reject empty requests', function ( done ) {
       chai.request(app)
-        .post('/api/employee/login/verify')
+        .post('/client-api/employee/login/verify')
         .then(function ( res ) {
           expect(res).to.have.status(400);
           expect(res.error.text.toLowerCase()).to.contain('provide');
@@ -209,7 +209,7 @@ describe('Employee Route :: Login', function () {
 
     it('should 404 verifications not found', function ( done ) {
       chai.request(app)
-        .post('/api/employee/login/verify')
+        .post('/client-api/employee/login/verify')
         .send({
           token:    "ABCDEFG123456789",
           memberId: 943123123
@@ -229,7 +229,7 @@ describe('Employee Route :: Login', function () {
         if ( err ) throw err;
 
         chai.request(app)
-          .post('/api/employee/login/verify')
+          .post('/client-api/employee/login/verify')
           .send({
             token:    __verification.publicKey,
             memberId: 943123123
@@ -245,7 +245,7 @@ describe('Employee Route :: Login', function () {
 
     it('should reject verification requests with no memberId found', function ( done ) {
       chai.request(app)
-        .post('/api/employee/login/verify')
+        .post('/client-api/employee/login/verify')
         .send({
           token:    _verification.publicKey,
           memberId: 943111111
@@ -260,7 +260,7 @@ describe('Employee Route :: Login', function () {
 
     it('should reject verification requests with wrong ssn', function ( done ) {
       chai.request(app)
-        .post('/api/employee/login/verify')
+        .post('/client-api/employee/login/verify')
         .send({
           token:    _verification.publicKey,
           memberId: 943000000
@@ -282,7 +282,7 @@ describe('Employee Route :: Login', function () {
         if ( err ) throw err;
 
         chai.request(app)
-          .post('/api/employee/login/verify')
+          .post('/client-api/employee/login/verify')
           .send({
             token:    v.publicKey,
             memberId: 943000000

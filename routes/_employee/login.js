@@ -11,5 +11,5 @@ module.exports = function ( app ) {
   loginRouter.post('/', loginHandler.login);
   loginRouter.post('/verify', loginHandler.verify);
 
-  app.use('/api/employee/login', loginRouter);
+  app.use('/client-api/employee/login', loginRouter);
 };
