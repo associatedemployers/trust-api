@@ -10,5 +10,5 @@ module.exports = function (app) {
   faqRouter.put('/:id', faqHandler.update);
   faqRouter.delete('/:id', faqHandler.del);
 
-  app.use('/api/faqs', faqRouter);
+  app.use('/client-api/faqs', faqRouter);
 };
