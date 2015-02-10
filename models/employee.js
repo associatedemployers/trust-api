@@ -4,7 +4,8 @@
 
 var mongoose = require('mongoose'),
     Promise  = require('bluebird'), // jshint ignore:line
-    Schema   = mongoose.Schema;
+    Schema   = mongoose.Schema,
+    _        = require('lodash');
 
 var createModel = require('./helpers/create-model');
 
@@ -42,7 +43,7 @@ var beneficiarySchema = new Schema({
 var loginSchema = new Schema({
   ip: String,
   time_stamp: { type: Date, default: Date.now }
-}, { _id: false });
+}, { _id: true });
 
 /*
   Doc Schema
@@ -145,13 +146,12 @@ var employeeSchema = new Schema({
  * 
  * @return {Object} Promise
  */
-employeeSchema.methods.recordLogin = function ( ip, time ) {
+employeeSchema.methods.recordLogin = function ( ip ) {
   var self = this;
 
   return new Promise(function ( resolve, reject ) {
     self.logins.push({
-      ip:         ip,
-      time_stamp: time
+      ip: ip
     });
 
     self.save(function ( err, result ) {
@@ -184,6 +184,10 @@ employeeSchema.pre('save', function ( next ) {
       next.call( self );
     });
   }, next); // Next will throw the error
+});
+
+employeeSchema.virtual('lastLogin').get(function () {
+  return ( !this.logins || this.logins.length < 1 ) ? null : _.sortBy(this.logins, 'time_stamp')[ 0 ];
 });
 
 employeeSchema = ticker

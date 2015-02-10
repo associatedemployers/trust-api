@@ -29,6 +29,15 @@ exports.login = function ( req, res, next ) {
 
   var foundEmployee = function ( employee ) {
     _generateAuthorization( employee )
+      .then(function ( auth ) {
+          if ( req.ip ) {
+            return employee.recordLogin(req.ip.replace('::ffff:', '')).then(function ( /* logins */ ) {
+              return auth;
+            });
+          } else {
+            return auth;
+          }
+        })
       .then( _respondWithAuthorization.bind( res ) )
       .catch( handleError );
   };

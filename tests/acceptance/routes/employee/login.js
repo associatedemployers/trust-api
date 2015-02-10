@@ -178,6 +178,31 @@ describe('Employee Route :: Login', function () {
         });
     });
 
+    it('should still record a login for previous log in', function ( done ) {
+      chai.request(app)
+        .post('/client-api/employee/login')
+        .send({
+          ssn: 222111222
+        })
+        .then(function ( res ) {
+          var body = res.body;
+
+          expect(res).to.have.status(200);
+          expect(body.verificationRequired).to.equal(false);
+          expect(body.token).to.exist;
+          expect(body.user).to.equal(_testEmployees[0]._id.toString());
+          expect(moment(body.expiration).isValid()).to.be.ok;
+
+          Employee.findById(_testEmployees[0]._id, function ( err, __employee ) {
+            if ( err ) throw err;
+
+            expect( __employee.logins ).to.have.length(3);
+
+            done();
+          });
+        });
+    });
+
   });
 
   describe('Verification (Stage 2)', function () {

@@ -19,10 +19,10 @@ var dependentSchema = new Schema({
   // Relational
   employee: { type: Schema.ObjectId, ref: 'Employee' },
   plans: {
-    medical: [{ plan: { type: Schema.ObjectId, ref: 'MedicalRate' }, covering: String }],
-    dental:  [{ plan: { type: Schema.ObjectId, ref: 'DentalRate' },  covering: String }],
-    vision:  [{ plan: { type: Schema.ObjectId, ref: 'VisionRate' },  covering: String }],
-    life:    [{ plan: { type: Schema.ObjectId, ref: 'LifeRate' },    covering: String }]
+    medical: [{ type: Schema.ObjectId, ref: 'MedicalRate' }],
+    dental:  [{ type: Schema.ObjectId, ref: 'DentalRate' }],
+    vision:  [{ type: Schema.ObjectId, ref: 'VisionRate' }],
+    life:    [{ type: Schema.ObjectId, ref: 'LifeRate' }]
   },
 
   // Info
@@ -31,7 +31,7 @@ var dependentSchema = new Schema({
   gender:                String,
   ebmsTerminationCode:   String,
   otherInsuranceCompany: String, // Dependent's Other Health Insurance Company
-  memberId:              String,
+  memberId:              Number,
   legacyId:              String,
 
   // Legacy Fields
