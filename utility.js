@@ -1,6 +1,7 @@
 var parseArgs = require('minimist'),
     winston   = require('winston'),
     chalk     = require('chalk'),
+    _         = require('lodash'),
     Promise   = require('bluebird'); // jshint ignore:line
 
 var slog         = require('single-line-log').stdout,
@@ -28,12 +29,20 @@ _parseAndRunCommands();
  * Initializes the access import
  * @return {Promise}
  */
-function _importAccessData () {
+function _importAccessData ( files ) {
+  if ( typeof files === 'string' ) {
+    var filesToImport = files.split(':').map(function ( file ) {
+      return _.find( fileManifest, { type: file } );
+    }).filter(function ( file ) {
+      return _.isObject( file );
+    });
+  }
+
   return new Promise(function ( resolve, reject ) {
     var dataMapper = new Mapper({
       freshness: '1 day',
       injectAndNormalize: true
-    }).setupFiles( fileManifest );
+    }).setupFiles( filesToImport || fileManifest );
 
     dataMapper.connect(function () {
       dataMapper.run(function ( fileObjects ) {
@@ -49,7 +58,7 @@ function _importAccessData () {
  * Initializes a file import
  * @return {Promise}
  */
-function _importFiles (  ) {
+function _importFiles () {
   return fileImport();
 }
 
@@ -69,7 +78,7 @@ function _parseAndRunCommands () {
     var command = commands[ arg ];
 
     if ( command && typeof command === 'function' ) {
-      ops.push( command() );
+      ops.push( command( args[ arg ] ) );
     }
   }
 
