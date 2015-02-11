@@ -16,6 +16,14 @@ var dependentSchema = new Schema({
     suffix:        String
   },
 
+  address: {
+    line1:   String,
+    line2:   String,
+    city:    String,
+    state:   String,
+    zipcode: String
+  },
+
   // Relational
   employee: { type: Schema.ObjectId, ref: 'Employee' },
   plans: {

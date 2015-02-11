@@ -17,6 +17,7 @@ var rateSchema = new Schema({
   legacyNetwork: String,
   coInsurance:   String,
   deductible:    Number,
+  embedded:      Boolean,
   name:          String,
 
   // Actual Rates

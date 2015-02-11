@@ -15,6 +15,7 @@ var rateSchema = new Schema({
   deductible:          String,
   planNumber:          String,
   name:                String,
+  voluntary:           Boolean,
 
   // Actual Rates
   employee:            Number,
