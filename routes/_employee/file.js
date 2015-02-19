@@ -12,7 +12,10 @@ module.exports = function ( app ) {
   fileRouter.use( sessionMiddleware('Session') );
 
   fileRouter.get('/:id', clientParser, fileHandler.fetchByID);
-  fileRouter.post('/', fileHandler.upload);
+  fileRouter.post('/', function ( req, res, next ) {
+    console.log(req);
+    next();
+  }, fileHandler.upload);
   fileRouter.put('/:id', clientParser, fileHandler.update);
   fileRouter.delete('/:id', clientParser, fileHandler.del);
 
