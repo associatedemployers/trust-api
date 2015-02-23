@@ -1,6 +1,7 @@
 var cwd = process.cwd();
 
 var express                = require('express'),
+    busboy                 = require('connect-busboy'),
     fileHandler            = require(cwd + '/handlers/_employee/file'),
     sessionMiddleware      = require(cwd + '/lib/security/middleware/session'),
     clientParserMiddleware = require(cwd + '/lib/security/middleware/client-parser');
@@ -12,10 +13,7 @@ module.exports = function ( app ) {
   fileRouter.use( sessionMiddleware('Session') );
 
   fileRouter.get('/:id', clientParser, fileHandler.fetchByID);
-  fileRouter.post('/', function ( req, res, next ) {
-    console.log(req);
-    next();
-  }, fileHandler.upload);
+  fileRouter.post('/', busboy(), fileHandler.upload);
   fileRouter.put('/:id', clientParser, fileHandler.update);
   fileRouter.delete('/:id', clientParser, fileHandler.del);
 

@@ -13,8 +13,8 @@ var noteSchema = new Schema({
 }, { _id: true });
 
 var fileSchema = new Schema({
-  attachments: [{ type: mongoose.Schema.ObjectId, ref: 'File' }],
-  notes:       [ noteSchema ],
+  attachments:  [{ type: mongoose.Schema.ObjectId, ref: 'File' }],
+  notes:        [ noteSchema ],
   company:      { type: mongoose.Schema.ObjectId, ref: 'Company', index: true },
   employee:     { type: mongoose.Schema.ObjectId, ref: 'Employee', index: true },
   historyEvent: { type: mongoose.Schema.ObjectId, ref: 'HistoryEvent', index: true },
@@ -23,6 +23,9 @@ var fileSchema = new Schema({
   name:                String,
   electronicSignature: String,
   extension:           { type: String, index: true },
+  mimeType:            String,
+  encoding:            String,
+  location:            String,
   labels:              [ String ],
 
   // System

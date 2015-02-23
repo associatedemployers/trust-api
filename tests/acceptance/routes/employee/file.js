@@ -33,8 +33,15 @@ var dataSignature = '12345678123456789',
     encryptor     = require('simple-encryptor')(dataSignature);
 
 describe('Employee Route :: Files', function () {
-
   var _testEmployee, _company, _auth;
+
+  var globSync       = require('glob').sync,
+      fs             = require('fs-extra'),
+      _testFilePaths = globSync(cwd + '/tests/support/test-files/*.*'),
+      _fileDir       = cwd + require(cwd + '/config/app-config').test.clientUploadDirectory,
+      _testFiles     = _testFilePaths.map(function ( path ) {
+        return fs.readFileSync( path );
+      });
 
   /* Test support */
   before(function ( done ) {
@@ -84,17 +91,12 @@ describe('Employee Route :: Files', function () {
 
   after(function ( done ) {
     var mongoose = require('mongoose');
-    mongoose.connection.db.dropDatabase(done);
+
+    fs.remove(_fileDir, function () {
+      mongoose.connection.db.dropDatabase(done);
+    });
   });
   /* ./ Test support */
-
-  var globSync       = require('glob').sync,
-      fs             = require('fs-extra'),
-      _fileLocation  = cwd + '/files/employee/',
-      _testFilePaths = globSync(cwd + '/tests/support/test-files/*.*'),
-      _testFiles     = _testFilePaths.map(function ( path ) {
-        return fs.readFileSync( path );
-      });
 
   describe('GET', function () {
 
@@ -127,13 +129,12 @@ describe('Employee Route :: Files', function () {
         chai.request(app)
           .post('/client-api/files/')
           .set('X-API-Token', _auth.publicKey)
-          .attach(_testFiles[ 0 ], _testFilePaths[0])
+          .attach(_testFiles[0], _testFilePaths[0])
           .then(function ( res ) {
-            console.log(res.error.text);
             expect(res).to.have.status(201);
-            expect(res.body.file).to.be.an('object');
+            expect(res.body.file).to.be.an('array').and.have.length(1);
 
-            File.findById(res.body.file._id, function ( err, file ) {
+            File.findById(res.body.file[0]._id, function ( err, file ) {
               if ( err ) throw err;
 
               expect(file).to.exist;
@@ -146,18 +147,17 @@ describe('Employee Route :: Files', function () {
         chai.request(app)
           .post('/client-api/files/')
           .set('X-API-Token', _auth.publicKey)
-          .attach(_testFiles[ 0 ], _testFilePaths[0])
+          .attach(_testFiles[0], _testFilePaths[0])
           .then(function ( res ) {
-            console.log(res.error.text);
             expect(res).to.have.status(201);
 
-            File.findById(res.body.file._id, function ( err, file ) {
+            File.findById(res.body.file[0]._id, function ( err, file ) {
               if ( err ) throw err;
 
               expect(file).to.exist;
-              expect(file.employee).to.equal(_testEmployee._id);
+              expect(file.employee.toString()).to.equal(_testEmployee._id.toString());
 
-              Employee.findById(_testEmployee._id, function ( err, employee ) {
+              Employee.findOne({ _id: _testEmployee._id }, function ( err, employee ) {
                 if ( err ) throw err;
 
                 expect(employee.files).to.contain(file._id);
@@ -172,14 +172,13 @@ describe('Employee Route :: Files', function () {
         chai.request(app)
           .post('/client-api/files/')
           .set('X-API-Token', _auth.publicKey)
-          .attach(_testFiles[ 0 ], _testFilePaths[0])
-          .attach(_testFiles[ 1 ], _testFilePaths[1])
+          .attach(_testFiles[0], _testFilePaths[0])
+          .attach(_testFiles[2], _testFilePaths[2])
           .then(function ( res ) {
-            console.log(res.error.text);
             expect(res).to.have.status(201);
             expect(res.body.file).to.be.an('array');
 
-            File.find({ _id: { $in: [ res.body.file[0]._id, res.body.file[1]._id ] } }, function ( err, files ) {
+            File.find({ _id: { $in: _.map(res.body.file, '_id') } }, function ( err, files ) {
               if ( err ) throw err;
 
               expect(files).to.have.length(2);
@@ -192,18 +191,17 @@ describe('Employee Route :: Files', function () {
         chai.request(app)
           .post('/client-api/files/')
           .set('X-API-Token', _auth.publicKey)
-          .attach(_testFiles[ 0 ], _testFilePaths[0])
-          .attach(_testFiles[ 1 ], _testFilePaths[1])
+          .attach(_testFiles[0], _testFilePaths[0])
+          .attach(_testFiles[2], _testFilePaths[2])
           .then(function ( res ) {
-            console.log(res.error.text);
             expect(res).to.have.status(201);
 
             File.find({ _id: { $in: [ res.body.file[0]._id, res.body.file[1]._id ] } }, function ( err, files ) {
               if ( err ) throw err;
 
               expect(files).to.have.length(2);
-              expect(files[0].employee).to.equal(_testEmployee._id);
-              expect(files[1].employee).to.equal(_testEmployee._id);
+              expect(files[0].employee.toString()).to.equal(_testEmployee._id.toString());
+              expect(files[1].employee.toString()).to.equal(_testEmployee._id.toString());
 
               Employee.findById(_testEmployee._id, function ( err, employee ) {
                 if ( err ) throw err;
@@ -222,30 +220,42 @@ describe('Employee Route :: Files', function () {
         chai.request(app)
           .post('/client-api/files/')
           .set('X-API-Token', _auth.publicKey)
-          .attach(_testFiles[ 0 ], _testFilePaths[0])
+          .attach(_testFiles[1], _testFilePaths[1])
           .then(function ( res ) {
-            console.log(res.error.text);
             expect(res).to.have.status(201);
 
-            File.findById(res.body.file._id, function ( err, file ) {
+            File.findById(res.body.file[0]._id, function ( err, file ) {
               if ( err ) throw err;
 
-              var __location = _fileLocation + _testEmployee._id.toString + '-' + file._id.toString + '.' + file.extension;
-
               expect(file).to.exist;
-              expect(fs.readFileSync(__location)).to.equal(_testFiles[0]);
+              expect(fs.existsSync(file.location), 'File Exists').to.equal(true);
 
               done();
             });
           });
       });
 
-      it.skip('should create multiple files', function ( done ) {
+      it('should create multiple files', function ( done ) {
+        chai.request(app)
+          .post('/client-api/files/')
+          .set('X-API-Token', _auth.publicKey)
+          .attach(_testFiles[0], _testFilePaths[0])
+          .attach(_testFiles[1], _testFilePaths[1])
+          .then(function ( res ) {
+            expect(res).to.have.status(201);
 
-      });
+            File.find({ _id: { $in: _.map(res.body.file, '_id') } }, function ( err, file ) {
+              if ( err ) throw err;
 
-      it.skip('should work with all sorts of MIME Types', function ( done ) {
+              expect(file).to.have.length(2);
 
+              file.forEach(function ( f ) {
+                expect(fs.existsSync(f.location), 'File Exists').to.equal(true);
+              });
+
+              done();
+            });
+          });
       });
     });
   });
