@@ -1,0 +1,6 @@
+{
+  "clientUploadDirectory": "/files/employee",
+  "test": {
+    "clientUploadDirectory": "/client-file-test"
+  }
+}
