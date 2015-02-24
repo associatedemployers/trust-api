@@ -19,6 +19,9 @@ var enrollmentReviewSchema = new Schema({
   approved:    Boolean,
   eventType:   String,
   eventDate:   Date,
+  submitted:   Boolean,
+
+  electronicSignature: String,
 
   // System
   time_stamp: { type: Date, default: Date.now, index: true }
