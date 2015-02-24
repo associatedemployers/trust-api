@@ -212,6 +212,30 @@ describe('Employee Route :: Files', function () {
             });
           });
       });
+
+      it('should handle model data alongside file data', function ( done ) {
+        chai.request(app)
+          .post('/client-api/files/')
+          .set('X-API-Token', _auth.publicKey)
+          .attach(_testFiles[0], _testFilePaths[0])
+          .attach(_testFiles[2], _testFilePaths[2])
+          .field(_testFilePaths[0].split('/').pop() + '-label', 'test')
+          .field(_testFilePaths[2].split('/').pop() + '-label', 'test2')
+          .then(function ( res ) {
+            expect(res).to.have.status(201);
+            expect(res.body.file).to.be.an('array');
+
+            File.find({ _id: { $in: _.map(res.body.file, '_id') } }, function ( err, files ) {
+              if ( err ) throw err;
+
+              expect(files).to.have.length(2);
+              expect(files[0].labels).to.contain('test');
+              expect(files[1].labels).to.contain('test2');
+
+              done();
+            });
+          });
+      });
     });
 
     describe('fs functionality', function () {

@@ -21,8 +21,11 @@ exports.upload = function ( req, res, next ) {
       user   = req.session.user,
       dir    = cwd + ( getConfig('clientUploadDirectory') || '/files/client' ) + '/';
 
-  var files = [],
+  var files  = [],
+      labels = [],
       filestream;
+
+  winston.debug(chalk.dim('Client API :: File Upload :: Start'));
 
   if ( !busboy ) {
     // Reject empty requests
@@ -54,7 +57,8 @@ exports.upload = function ( req, res, next ) {
           location:  dest,
           extension: ext,
           mimeType:  mimetype,
-          encoding:  encoding
+          encoding:  encoding,
+          labels:    ( labels[ filename ] ) ? [ labels[ filename ] ] : null
         });
 
         winston.debug(chalk.dim('Client API :: File Upload :: Saving file document for', filename));
@@ -70,6 +74,12 @@ exports.upload = function ( req, res, next ) {
     });
 
     files.push( promise );
+  });
+
+  busboy.on('field', function ( key, value ) {
+    if ( key.indexOf('-label') > -1 ) {
+      labels[ key.replace('-label', '') ] = value;
+    }
   });
 
   busboy.on('finish', function () {
