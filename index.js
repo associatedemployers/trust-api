@@ -26,12 +26,13 @@ if( cluster.isMaster ) {
 
   app.registerModels();
 
-  var express = require('express'),
-      server  = app.init(express()),
-      port    = process.env.port || 3000;
+  var express      = require('express'),
+      SocketServer = require('./lib/socket/server'),
+      server       = require('http').Server(app.init(express())),
+      socketServer = new SocketServer(server),
+      port         = process.env.port || 3000;
 
   server.listen(port, function () {
     winston.info(chalk.dim('[', cluster.worker.id, '] Worker listening on port:', port));
   });
 }
-
