@@ -17,6 +17,7 @@ expirationGen = tokenModule.expirationGenerator(2, 'hours');
 var verificationSchema = new Schema({
   publicKey:  String,
   privateKey: String,
+  shortId:    String,
 
   expiration: { type: Date, default: expirationGen, index: true },
   created:    { type: Date, default: Date.now }
