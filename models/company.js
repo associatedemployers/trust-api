@@ -31,6 +31,12 @@ var companySchema = new Schema({
     zipcode: String
   },
 
+  login: {
+    companyId: String,
+    email:     String,
+    password:  String
+  },
+
   // Relational
   medicalRates:      [{ type: mongoose.Schema.ObjectId, ref: 'MedicalRate' }],
   dentalRates:       [{ type: mongoose.Schema.ObjectId, ref: 'DentalRate' }],
@@ -87,6 +93,10 @@ companySchema = ticker
       'address.state',
       'address.zipcode'
     ]
+  })
+  .plugin(cryptify, {
+    paths: [ 'login.password' ],
+    factor: 11
   });
 
 module.exports = createModel('Company', companySchema);
