@@ -79,22 +79,46 @@ describe('Company Route :: Login', function () {
       .then(done);
   });
 
-  it.skip('should reject verification requests with no companyId or email found', function ( done ) {
+  it('should reject requests with no companyId or email found', function ( done ) {
+    var _expect404 = function ( res ) {
+      expect(res).to.have.status(404);
+      expect(res.error.text.toLowerCase()).to.contain('not found');
+    };
+
     chai.request(app)
       .post('/client-api/company/login')
       .send({
         companyId: 'shipit',
         password:  'notarealcompany'
       })
+      .then(_expect404)
       .then(function ( res ) {
-        expect(res).to.have.status(404);
-        expect(res.error.text.toLowerCase()).to.contain('memberid');
-
-        done();
-      });
+        return chai.request(app).post('/client-api/company/login').send({
+          email: 'ship@it.com',
+          password:  'notarealcompany'
+        });
+      })
+      .then(_expect404)
+      .then(done);
   });
 
-  it.skip('should return an authorization and record', function ( done ) {
+  it('should reject requests with invalid password', function ( done ) {
+    var _expect401 = function ( res ) {
+      expect(res).to.have.status(401);
+      expect(res.error.text.toLowerCase()).to.contain('password');
+    };
+
+    chai.request(app)
+      .post('/client-api/company/login')
+      .send({
+        companyId: _testData.companyId,
+        password:  _testData.password + 'wrong'
+      })
+      .then(_expect401)
+      .then(done);
+  });
+
+  it('should return an authorization and record login', function ( done ) {
     var _expectNormal = function ( res ) {
       var body = res.body;
 
@@ -122,9 +146,9 @@ describe('Company Route :: Login', function () {
         Company.findById(_company._id, function ( err, company ) {
           if ( err ) throw err;
 
-          expect(employee.logins.length).to.equal(2);
-          expect(employee.logins[0].ip).to.contain('127.0.0.1');
-          expect(employee.logins[0].time_stamp).to.exist;
+          expect(company.logins.length).to.equal(2);
+          expect(company.logins[0].ip).to.contain('127.0.0.1');
+          expect(company.logins[0].time_stamp).to.exist;
 
           done();
         });

@@ -3,6 +3,7 @@
 */
 
 var mongoose = require('mongoose'),
+    Promise  = require('bluebird'), // jshint ignore:line
     Schema   = mongoose.Schema;
 
 var createModel = require('./helpers/create-model');
@@ -10,6 +11,11 @@ var createModel = require('./helpers/create-model');
 var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
     cryptify   = require('./plugins/cryptify'),
     searchable = require('./plugins/searchable');
+
+var loginSchema = new Schema({
+  ip: String,
+  time_stamp: { type: Date, default: Date.now }
+}, { _id: true });
 
 var companySchema = new Schema({
   // From XML -> Companies
@@ -36,6 +42,8 @@ var companySchema = new Schema({
     email:     String,
     password:  String
   },
+
+  logins: [ loginSchema ],
 
   // Relational
   medicalRates:      [{ type: mongoose.Schema.ObjectId, ref: 'MedicalRate' }],
@@ -78,6 +86,33 @@ var companySchema = new Schema({
   // System
   time_stamp: { type: Date, default: Date.now, index: true }
 });
+
+/**
+ * Records a login to the document
+ * 
+ * @return {Object} Promise
+ */
+companySchema.methods.recordLogin = function ( ip ) {
+  var self = this;
+
+  return new Promise(function ( resolve, reject ) {
+    if ( !self.logins ) {
+      self.logins = [];
+    }
+
+    self.logins.push({
+      ip: ip
+    });
+
+    self.save(function ( err, result ) {
+      if ( err ) {
+        return reject( err );
+      }
+
+      resolve( result.logins );
+    });
+  });
+};
 
 companySchema = ticker
   .attach( companySchema )

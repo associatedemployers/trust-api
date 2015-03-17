@@ -8,13 +8,10 @@ var winston   = require('winston'),
     jwt       = require('jwt-simple'),
     _         = require('lodash');
 
-var company      = require(cwd + '/models/company'),
+var Company      = require(cwd + '/models/company'),
     Verification = require(cwd + '/models/verification'),
     session      = require(cwd + '/lib/security/session'),
     token        = require(cwd + '/lib/security/token');
-
-var dataSignature = ( process.env.environment === 'test' ) ? '12345678123456789' : require(process.cwd() + '/config/keys').dataSignature,
-    encryptor     = require('simple-encryptor')(dataSignature);
 
 exports.login = function ( req, res, next ) {
   var payload   = req.body,
@@ -30,39 +27,30 @@ exports.login = function ( req, res, next ) {
     respond.error.res(res, err, true);
   };
 
-  var foundcompany = function ( company ) {
-    _generateAuthorization( company )
-      .then(function ( auth ) {
-          if ( req.ip ) {
-            return company.recordLogin(req.ip.replace('::ffff:', '')).then(function ( /* logins */ ) {
-              return auth;
-            });
-          } else {
-            return auth;
-          }
-        })
-      .then( _respondWithAuthorization.bind( res ) )
-      .catch( handleError );
-  };
+  var query = ( companyId ) ? { 'login.companyId': companyId } : { 'login.email': email };
 
-  company.findOne({ ssnDc: ssn, enrolled: { $ne: true } }).exec().then(function ( company ) {
-    if ( company ) {
-      foundcompany( company );
-    } else {
-      company.find({}).exec().then(function ( companysByIp ) {
-        var ssnMatch = _.find(companysByIp, function ( record ) {
-          return ( record.ssn ) ? encryptor.decrypt( record.ssn ) === parseFloat( ssn ) : false;
-        });
-
-        return ( ssnMatch ) ? foundcompany( ssnMatch ) : _generateVerificationToken(ssn).then(function ( verification ) {
-          return res.status(200).send({
-            verificationRequired: true,
-            token:                verification.publicKey,
-            expiration:           verification.expiration
-          });
-        });
-      }).onReject( handleError );
+  Company.findOne(query).exec().then(function ( company ) {
+    if ( !company ) {
+      return res.status(404).send('Company not found with that email or companyId');
     }
+
+    bcp.compare(password, company.login.password, function ( err, matches ) {
+      if ( err ) {
+        handleError(err);
+      }
+
+      if ( !matches ) {
+        return res.status(401).send('Password does not match what we have on file');
+      }
+
+      _generateAuthorization(company)
+      .then(function ( auth ) {
+        return ( req.ip ) ? company.recordLogin(req.ip.replace('::ffff:', '')).then(function () {
+          return auth;
+        }) : auth;
+      })
+      .then(_respondWithAuthorization.bind(res));
+    });
   }).onReject( handleError );
 };
 
@@ -76,7 +64,7 @@ exports.login = function ( req, res, next ) {
  */
 function _generateAuthorization ( company ) {
   var sessionData = {
-    userId:   company._id.toString(),
+    userId: company._id.toString(),
   };
 
   return session.create(company._id, sessionData, 'Session', 'company', 'Company');
@@ -88,9 +76,8 @@ function _generateAuthorization ( company ) {
  * @param  {Object} res         Express response object
  * @return {Undefined}
  */
-function _respondWithAuthorization ( userSession, res ) {
-  res = res || this;
-  res.json({
+function _respondWithAuthorization ( userSession ) {
+  this.json({
     verificationRequired: false,
     token:                userSession.publicKey,
     expiration:           userSession.expiration,

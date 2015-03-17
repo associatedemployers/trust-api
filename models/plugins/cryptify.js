@@ -1,7 +1,5 @@
 /*
-  Cryptify
-  ---
-  Mongoose model plugin for using bcrypt on paths
+  Mongoose Cryptify
 */
 
 var bcp     = require('bcrypt'),
@@ -9,6 +7,13 @@ var bcp     = require('bcrypt'),
 
 module.exports = Cryptify;
 
+/**
+ * Cryptify Plugin Signature
+ * 
+ * @param  {Object} schema  Mongoose Schema
+ * @param  {Object} options Options Hash
+ * @return {Object}         Mongoose Schema
+ */
 function Cryptify ( schema, options ) {
   if( !options.paths ) {
     throw new Error('Cryptify requires "paths" to be specified in the options hash');
@@ -18,43 +23,52 @@ function Cryptify ( schema, options ) {
     return path.split('.');
   });
 
-  workFactor = options.factor || 10;
+  var workFactor = options.factor || 10;
 
   schema.pre('save', function ( next ) {
     var doc = this;
 
-    var getPathValue = function ( pathArray ) {
-      var recursive = doc;
+    var parseDocument = function ( err, previous ) {
+      if( err ) {
+        next( err );
+      }
 
-      pathArray.forEach(function ( subpath ) {
-        recursive = recursive[ subpath ];
-      });
+      Promise.reduce(paths, function ( doc, path ) {
+        var raw           = _getPathValue( doc, path ),
+            previousValue = ( previous ) ? _getPathValue( previous, path ) : false;
 
-      return recursive;
-    };
-
-    var setPathValue = function ( recursive, pathArray, value ) {
-        var len  = pathArray.length - 1;
-
-        for ( var i = 0; i < len; i++ ) {
-            recursive = recursive[ pathArray[ i ] ];
+        if( !raw || ( !!previousValue && previousValue === raw ) ) {
+          return doc;
         }
 
-        recursive[ pathArray[ len ] ] = value;
+        return _generateHash( raw , workFactor ).then(function ( hash ) {
+          _setPathValue( doc, path, hash );
+          return doc;
+        });
+      }, doc).then(function ( newDoc ) {
+        next.call( newDoc );
+      }).catch( next );
     };
 
-    Promise.reduce(paths, function ( doc, path ) {
-      return generateHash( getPathValue( path ) ).then(function ( hash ) {
-        setPathValue( doc, path, hash );
-        return doc;
-      });
-    }, doc).then(function ( newDoc ) {
-      next.call( newDoc );
-    }).catch( next );
+    if( doc.isNew ) {
+      parseDocument();
+    } else {
+      doc.constructor.findById(doc._id, parseDocument);
+    }
   });
+
+  return schema;
 }
 
-function generateHash ( raw ) {
+/**
+ * Generate Hash
+ *
+ * @private
+ * 
+ * @param  {String} raw
+ * @return {Promise}
+ */
+function _generateHash ( raw, workFactor ) {
   return new Promise(function ( resolve, reject ) {
     bcp.genSalt(workFactor, function ( err, salt ) {
       if( err ) {
@@ -70,4 +84,28 @@ function generateHash ( raw ) {
       });
     });
   });
+}
+
+/**
+ * Get Path Value
+ * @param  {Object} recursive Object to traverse
+ * @param  {Array} pathArray  Array of paths
+ * @return {Mixed}            Value
+ */
+function _getPathValue ( recursive, pathArray ) {
+  pathArray.forEach(function ( subpath ) {
+    recursive = recursive[ subpath ];
+  });
+
+  return recursive;
+}
+
+function _setPathValue ( recursive, pathArray, value ) {
+  var len = pathArray.length - 1;
+
+  for ( var i = 0; i < len; i++ ) {
+    recursive = recursive[ pathArray[ i ] ];
+  }
+
+  recursive[ pathArray[ len ] ] = value;
 }
