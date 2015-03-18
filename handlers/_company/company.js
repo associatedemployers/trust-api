@@ -4,12 +4,10 @@ var winston   = require('winston').loggers.get('default'),
     respond   = require('../response'),
     _         = require('lodash');
 
-var Employee      = require('../../models/employee'),
-    Company       = require('../../models/company'),
-    MedicalRate   = require('../../models/medical-rate'),
+var Company       = require('../../models/company'),
     ResourceMixin = require('../../lib/mixins/resource-handler');
 
-exports.fetchByID = ResourceMixin.getById('Employee', 'plans.medical plans.dental plans.vision plans.life', null, 'logins');
+exports.fetchByID = ResourceMixin.getById('Company', 'medicalRates dentalRates visionRates', null, 'logins', 'login.password');
 
 exports.update = function ( req, res, next ) {
   respond.code.notimplemented(res);

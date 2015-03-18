@@ -1,19 +1,14 @@
 var cwd = process.cwd();
 
 var express                = require('express'),
-    employeeHandler        = require(cwd + '/handlers/_employee/employee'),
+    employeeHandler        = require(cwd + '/handlers/_company/employee'),
     sessionMiddleware      = require(cwd + '/lib/security/middleware/session'),
     clientParserMiddleware = require(cwd + '/lib/security/middleware/client-parser');
 
 module.exports = function ( app ) {
   var employeeRouter = express.Router();
-
   employeeRouter.use( sessionMiddleware('Session') );
-  employeeRouter.use( clientParserMiddleware('id', '_id') );
-
-  employeeRouter.get('/:id', employeeHandler.fetchByID);
-  employeeRouter.put('/:id', employeeHandler.update);
-  employeeRouter.delete('/:id', employeeHandler.del);
+  employeeRouter.get('/', employeeHandler.fetchAll);
 
   app.use('/client-api/employees', employeeRouter);
 };

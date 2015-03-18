@@ -125,6 +125,7 @@ describe('Company Route :: Login', function () {
       expect(res).to.have.status(200);
       expect(body.token).to.exist;
       expect(body.user).to.equal(_company._id.toString());
+      expect(body.type).to.equal('company');
       expect(moment(body.expiration).isValid()).to.be.ok;
     };
 

@@ -4,7 +4,8 @@
 
 var mongoose = require('mongoose'),
     Promise  = require('bluebird'), // jshint ignore:line
-    Schema   = mongoose.Schema;
+    Schema   = mongoose.Schema,
+    _        = require('lodash');
 
 var createModel = require('./helpers/create-model');
 
@@ -113,6 +114,10 @@ companySchema.methods.recordLogin = function ( ip ) {
     });
   });
 };
+
+companySchema.virtual('lastLogin').get(function () {
+  return ( !this.logins || this.logins.length < 1 ) ? null : _.sortBy(this.logins, 'time_stamp')[ 0 ];
+});
 
 companySchema = ticker
   .attach( companySchema )

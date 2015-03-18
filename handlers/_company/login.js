@@ -78,9 +78,9 @@ function _generateAuthorization ( company ) {
  */
 function _respondWithAuthorization ( userSession ) {
   this.json({
-    verificationRequired: false,
-    token:                userSession.publicKey,
-    expiration:           userSession.expiration,
-    user:                 userSession.user.toString()
+    type:       'company',
+    token:      userSession.publicKey,
+    expiration: userSession.expiration,
+    user:       userSession.user.toString()
   });
 }
