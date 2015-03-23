@@ -116,7 +116,7 @@ companySchema.methods.recordLogin = function ( ip ) {
 };
 
 companySchema.virtual('lastLogin').get(function () {
-  return ( !this.logins || this.logins.length < 1 ) ? null : _.sortBy(this.logins, 'time_stamp')[ 0 ];
+  return ( !this.logins || this.logins.length < 1 ) ? null : _.sortBy(this.logins, 'time_stamp')[ 1 ];
 });
 
 companySchema = ticker
