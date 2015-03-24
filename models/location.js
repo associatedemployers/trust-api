@@ -10,7 +10,7 @@ var mongoose = require('mongoose'),
 var createModel = require('./helpers/create-model');
 
 var locationSchema = new Schema({
-  ebmsNumber:          String,
+  ebmsNumbers:         [ String ],
   legacyCompanyNumber: String,
   soleProprietorship:  Boolean,
   embeddedDeductible:  Boolean,
@@ -23,10 +23,10 @@ var locationSchema = new Schema({
     state:   String,
     zipcode: String,
   },
-  
+
   contact: {
-   phone: String,
-   fax:   String,
+    phone: String,
+    fax:   String,
   },
 
   company:   { type: mongoose.Schema.ObjectId, ref: 'Company' },
