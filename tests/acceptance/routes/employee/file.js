@@ -22,7 +22,6 @@ plugins.map(function ( plugin ) {
 chai.request.addPromises(Promise);
 
 var app          = require(cwd + '/app').init( require('express')() ),
-    session      = require(cwd + '/lib/security/session'),
     mongoose     = require('mongoose'),
     Employee     = require(cwd + '/models/employee'),
     File         = require(cwd + '/models/file'),

@@ -2,7 +2,9 @@
   "port": 3000,
   "socketPort": 3002,
   "clientUploadDirectory": "/files/employee",
+  "temporaryFileDirectory": "/temp",
   "test": {
-    "clientUploadDirectory": "/client-file-test"
+    "clientUploadDirectory": "/client-file-test",
+    "temporaryFileDirectory": "/temp-test"
   }
 }
