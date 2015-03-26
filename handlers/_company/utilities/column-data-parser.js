@@ -3,6 +3,7 @@ var cwd = process.cwd();
 var winston   = require('winston').loggers.get('default'),
     chalk     = require('chalk'),
     respond   = require(cwd + '/handlers/response'),
+    moment    = require('moment'),
     _         = require('lodash');
 
 var getConfig = require(cwd + '/lib/utilities/get-config'),
@@ -79,7 +80,7 @@ exports.parse = function ( req, res, next ) {
     .then(_parseCsv)
     .then(_interpretCsvData)
     .then(function ( result ) {
-      res.status(200).send(result);
+      res.status(200).json(result);
     })
     .catch(UserError, function ( err ) {
       res.status(400).send(err.message);
@@ -123,6 +124,41 @@ function _interpretCsvData ( dataArray ) {
     });
   };
 
+  var _isDate = function ( value ) {
+    if ( !/([0-9]){1,4}[\/-]([0-9]){1,2}[\/-]([0-9]){1,4}/.test(value) ) {
+      return false;
+    }
+
+    var validDate;
+    var validDateFormats = [
+      'YYYY/MM/DD',
+      'MM/DD/YYYY',
+      'MM-DD-YYYY',
+      'YYYY-MM-DD'
+    ];
+
+    validDateFormats.forEach(function ( format ) {
+      var _d = moment(value, format);
+      if ( _d.isValid() ) {
+        validDate = _d.toDate();
+      }
+    });
+
+    return validDate || false;
+  };
+
+  var _parseRow = function ( row ) {
+    return row.map(function ( col ) {
+      if ( !col || col.length < 1 ) {
+        return col;
+      }
+
+      var isDate = _isDate(col);
+
+      return ( isDate ) ? isDate : col;
+    });
+  };
+
   _.forOwn(employeeHeaders, function ( fuzz, field ) {
     fuzz.forEach(_pushHeader.bind({ field: field }));
   });
@@ -136,8 +172,9 @@ function _interpretCsvData ( dataArray ) {
       matchedWith: match.header,
       originalHeader: colHeader
     };
-
   });
+
+  dataArray = dataArray.concat(dataArray.splice(1, dataArray.length).map(_parseRow));
 
   return dataArray;
 }

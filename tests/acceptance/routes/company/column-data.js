@@ -26,9 +26,9 @@ var app          = require(cwd + '/app').init( require('express')() ),
     Company      = require(cwd + '/models/company'),
     session      = require(cwd + '/lib/security/session');
 
-function _indexByExt ( array, ext ) {
+function _indexByExt ( array, ext, filename ) {
   return _.findIndex(array, function ( path ) {
-    return path.split('.').pop() === ext;
+    return path.split('.').pop() === ext && (!filename || path.split('/').pop() === filename);
   });
 }
 
@@ -85,7 +85,7 @@ describe('Employee Route :: Employee Column Data Import', function () {
 
   describe('Processing', function () {
     it('should process csv files', function ( done ) {
-      var fileIndex = _indexByExt(_testFilePaths, 'csv');
+      var fileIndex = _indexByExt(_testFilePaths, 'csv', 'test.csv');
 
       chai.request(app)
         .post('/client-api/company-utilities/column-data')
@@ -128,8 +128,8 @@ describe('Employee Route :: Employee Column Data Import', function () {
         });
     });
 
-    it('should parse column headers', function ( done ) {
-      var fileIndex = _indexByExt(_testFilePaths, 'csv');
+    it('should parse dates', function ( done ) {
+      var fileIndex = _indexByExt(_testFilePaths, 'csv', 'date-test.csv');
 
       chai.request(app)
         .post('/client-api/company-utilities/column-data')
@@ -137,7 +137,24 @@ describe('Employee Route :: Employee Column Data Import', function () {
         .attach(_testFiles[fileIndex], _testFilePaths[fileIndex])
         .then(function ( res ) {
           expect(res).to.have.status(200);
-          console.log(res.body);
+          expect(res.body).to.be.an('array');
+          res.body.slice(1, res.body.length).forEach(function ( row ) {
+            expect(moment(row[0]).format('MM/DD/YYYY')).to.equal('01/20/2015');
+          });
+          done();
+        });
+    });
+
+    it('should parse column headers', function ( done ) {
+      var fileIndex = _indexByExt(_testFilePaths, 'csv', 'test.csv');
+
+      chai.request(app)
+        .post('/client-api/company-utilities/column-data')
+        .set('X-API-Token', _auth.publicKey)
+        .attach(_testFiles[fileIndex], _testFilePaths[fileIndex])
+        .then(function ( res ) {
+          expect(res).to.have.status(200);
+
           var csvCompare = [
             [
               {

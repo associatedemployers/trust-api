@@ -23,6 +23,7 @@
     "chalk": "^0.5.1",
     "connect-busboy": "0.0.2",
     "convert-json": "^0.5.0",
+    "date-reader": "0.0.2",
     "deep-diff": "^0.3.0",
     "email-templates": "^1.1.2",
     "express": "^4.10.2",
