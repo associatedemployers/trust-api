@@ -39,7 +39,7 @@ describe('Employee Route :: Employee Column Data Import', function () {
       fs             = require('fs-extra'),
       _testFilePaths = globSync(cwd + '/tests/support/column-data-test-files/*.*'),
       _testFiles     = _testFilePaths.map(function ( path ) {
-        return fs.readFileSync( path, { encoding: 'utf8' } );
+        return fs.readFileSync( path );
       });
 
   /* Test support */
@@ -77,7 +77,6 @@ describe('Employee Route :: Employee Column Data Import', function () {
         .post('/client-api/company-utilities/column-data')
         .set('X-API-Token', _auth.publicKey)
         .then(function ( res ) {
-          console.log(res.error.text);
           expect(res).to.have.status(400);
           done();
         });
@@ -94,12 +93,20 @@ describe('Employee Route :: Employee Column Data Import', function () {
         .attach(_testFiles[fileIndex], _testFilePaths[fileIndex])
         .then(function ( res ) {
           expect(res).to.have.status(200);
+          var csvCompare = [
+            [ 'Mocha', 'T', 'Test', 'Jr', '123456789', 'mocha@test.js', '' ],
+            [ 'Mochas', 'A', 'Btest', 'Sr', '123456781', 'mocha@test2.js', '' ],
+            [ 'Mocha', '', 'Ctest', '', '123456782', 'mocha@test3.js', '' ]
+          ];
+          expect(res.body).to.be.an('array').and.have.length(4);
+          expect(res.body.slice(1, 4)).to.deep.equal(csvCompare);
+          done();
         });
     });
 
-    it('should process xls files', function ( done ) {
+    it.skip('should process xls files', function ( done ) {
       var fileIndex = _indexByExt(_testFilePaths, 'xls');
-      console.log(_testFilePaths[fileIndex]);
+
       chai.request(app)
         .post('/client-api/company-utilities/column-data')
         .set('X-API-Token', _auth.publicKey)
@@ -109,7 +116,7 @@ describe('Employee Route :: Employee Column Data Import', function () {
         });
     });
 
-    it('should process xlsx files', function ( done ) {
+    it.skip('should process xlsx files', function ( done ) {
       var fileIndex = _indexByExt(_testFilePaths, 'xlsx');
 
       chai.request(app)
@@ -121,15 +128,61 @@ describe('Employee Route :: Employee Column Data Import', function () {
         });
     });
 
-    it.skip('should parse custom column headers reasonably well', function ( done ) {
-      chai.request(app)
-        .post('/client-api/files/')
-        .set('X-API-Token', _auth.publicKey)
-        .attach(_testFiles[0], _testFilePaths[0])
-        .attach(_testFiles[1], _testFilePaths[1])
-        .then(function ( res ) {
-          expect(res).to.have.status(201);
+    it('should parse column headers', function ( done ) {
+      var fileIndex = _indexByExt(_testFilePaths, 'csv');
 
+      chai.request(app)
+        .post('/client-api/company-utilities/column-data')
+        .set('X-API-Token', _auth.publicKey)
+        .attach(_testFiles[fileIndex], _testFilePaths[fileIndex])
+        .then(function ( res ) {
+          expect(res).to.have.status(200);
+          console.log(res.body);
+          var csvCompare = [
+            [
+              {
+                mapsTo: 'name.first',
+                matchedWith: 'firstname',
+                originalHeader: 'First Name'
+              },
+              {
+                mapsTo: 'name.middleInitial',
+                matchedWith: 'middleinitial',
+                originalHeader: 'Middle Initial'
+              },
+              {
+                mapsTo: 'name.last',
+                matchedWith: 'lastname',
+                originalHeader: 'Last Name'
+              },
+              {
+                mapsTo: 'name.suffix',
+                matchedWith: 'suffix',
+                originalHeader: 'Suffix'
+              },
+              {
+                mapsTo: 'ssn',
+                matchedWith: 'ssn',
+                originalHeader: 'SSN'
+              },
+              {
+                mapsTo: 'email',
+                matchedWith: 'emailaddress',
+                originalHeader: 'Email Address'
+              },
+              {
+                mapsTo: 'legacyClientEmploymentDate',
+                matchedWith: 'hiredate',
+                originalHeader: 'Hire Date'
+              }
+            ],
+            [ 'Mocha', 'T', 'Test', 'Jr', '123456789', 'mocha@test.js', '' ],
+            [ 'Mochas', 'A', 'Btest', 'Sr', '123456781', 'mocha@test2.js', '' ],
+            [ 'Mocha', '', 'Ctest', '', '123456782', 'mocha@test3.js', '' ]
+          ];
+
+          expect(res.body).to.deep.equal(csvCompare);
+          done();
         });
     });
   });
