@@ -27,7 +27,7 @@ exports.login = function ( req, res, next ) {
     respond.error.res(res, err, true);
   };
 
-  var query = ( companyId ) ? { 'login.companyId': companyId } : { 'login.email': email };
+  var query = ( companyId ) ? { 'login.companyId': companyId.toUpperCase() } : { 'login.email': email.toLowerCase() };
 
   Company.findOne(query).exec().then(function ( company ) {
     if ( !company ) {

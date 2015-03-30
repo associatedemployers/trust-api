@@ -13,6 +13,8 @@ var getConfig = require(cwd + '/lib/utilities/get-config'),
     fs        = require('fs-extra'),
     Promise   = require('bluebird'); // jshint ignore:line
 
+var requiredFields = [ 'ssn', 'hiredate' ];
+
 function UserError ( message ) {
   this.message = message || 'Bad request';
   return this;
@@ -163,20 +165,38 @@ function _interpretCsvData ( dataArray ) {
     fuzz.forEach(_pushHeader.bind({ field: field }));
   });
 
-  dataArray[0] = dataArray[0].map(function ( colHeader ) {
+  dataArray[0] = dataArray[0].map(function ( colHeader, index ) {
     var parsedCol = _parseCol(colHeader),
         match = _.find(fuzzyHeaders, { header: parsedCol });
 
-    return {
+    if ( !match ) {
+      return {
+        originalHeader: colHeader
+      };
+    }
+
+    var ret = {
       mapsTo: match.to,
       matchedWith: match.header,
       originalHeader: colHeader
     };
+
+    if ( requiredFields.indexOf(match.header) > -1 ) {
+      ret.missingFields = findUndefinedInCol(dataArray.slice(0, dataArray.length), index);
+    }
+
+    return ret;
   });
 
   dataArray = dataArray.concat(dataArray.splice(1, dataArray.length).map(_parseRow));
 
   return dataArray;
+}
+
+function findUndefinedInCol ( rows, colIndex ) {
+  return rows.reduce(function ( isUndefined, row ) {
+    return ( !isUndefined && (!row[ colIndex ] || row[colIndex].length < 1) ) ? true : isUndefined;
+  }, false);
 }
 
 /*

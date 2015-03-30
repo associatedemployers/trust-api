@@ -154,7 +154,6 @@ describe('Employee Route :: Employee Column Data Import', function () {
         .attach(_testFiles[fileIndex], _testFilePaths[fileIndex])
         .then(function ( res ) {
           expect(res).to.have.status(200);
-
           var csvCompare = [
             [
               {
@@ -180,7 +179,8 @@ describe('Employee Route :: Employee Column Data Import', function () {
               {
                 mapsTo: 'ssn',
                 matchedWith: 'ssn',
-                originalHeader: 'SSN'
+                originalHeader: 'SSN',
+                missingFields: false
               },
               {
                 mapsTo: 'email',
@@ -190,7 +190,8 @@ describe('Employee Route :: Employee Column Data Import', function () {
               {
                 mapsTo: 'legacyClientEmploymentDate',
                 matchedWith: 'hiredate',
-                originalHeader: 'Hire Date'
+                originalHeader: 'Hire Date',
+                missingFields: true
               }
             ],
             [ 'Mocha', 'T', 'Test', 'Jr', '123456789', 'mocha@test.js', '' ],

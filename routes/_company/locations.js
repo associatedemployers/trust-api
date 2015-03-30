@@ -1,15 +1,15 @@
 var cwd = process.cwd();
 
 var express                = require('express'),
-    employeeHandler        = require(cwd + '/handlers/_company/employee'),
+    locationHandler        = require(cwd + '/handlers/_company/location'),
     sessionMiddleware      = require(cwd + '/lib/security/middleware/session'),
     clientParserMiddleware = require(cwd + '/lib/security/middleware/client-parser');
 
 module.exports = function ( app ) {
-  var employeeRouter = express.Router();
+  var locationRouter = express.Router();
 
-  employeeRouter.use( sessionMiddleware('Session') );
-  employeeRouter.get('/', employeeHandler.fetchAll);
+  locationRouter.use( sessionMiddleware('Session') );
+  locationRouter.get('/', locationHandler.fetchAll);
 
-  app.use('/client-api/employees', employeeRouter);
+  app.use('/client-api/locations', locationRouter);
 };
