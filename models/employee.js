@@ -99,7 +99,7 @@ var employeeSchema = new Schema({
   notes:          [ noteSchema ],
   logins:         [ loginSchema ],
 
-  ssn:           String,
+  ssn:           { type: String, required: true },
   ssnDc:         Number, // Temporary field while enrolling to be able to find the record until memberid is gen'd
   gender:        String,
   maritalStatus: String,
