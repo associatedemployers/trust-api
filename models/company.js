@@ -46,7 +46,7 @@ var companySchema = new Schema({
 
   logins: [ loginSchema ],
 
-  automaticEmailNotifications: { type: boolean, default: true },
+  automaticEmailNotifications: { type: Boolean, default: true },
 
   // Relational
   medicalRates:      [{ type: mongoose.Schema.ObjectId, ref: 'MedicalRate' }],
