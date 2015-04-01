@@ -83,6 +83,7 @@ describe('Employee Route :: Login', function () {
         {
           _id:      company.employees[ 2 ],
           company:  company._id,
+          ssn:      '123',
           ssnDc:    222111224,
           enrolled: false,
           name: {

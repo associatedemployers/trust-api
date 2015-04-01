@@ -122,7 +122,8 @@ describe('Route :: Employees', function () {
           name: {
             first: 'test',
             last:  'me'
-          }
+          },
+          ssn: '123'
         });
 
         testEmployee.save(function ( err, emp ) {
