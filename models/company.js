@@ -44,6 +44,24 @@ var companySchema = new Schema({
     password:  String
   },
 
+  contribution: {
+    enabled: Boolean,
+    onRates: Boolean,
+    network: { type: mongoose.Schema.ObjectId, ref: 'MedicalPlan' },
+    employee: {
+      amount: Number,
+      type:   String,
+    },
+    spouse: {
+      amount: Number,
+      type:   String,
+    },
+    children: {
+      amount: Number,
+      type:   String,
+    }
+  },
+
   logins: [ loginSchema ],
 
   automaticEmailNotifications: { type: Boolean, default: true },
