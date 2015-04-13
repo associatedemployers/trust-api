@@ -9,7 +9,7 @@ var columnDataHandler = require(cwd + '/handlers/_company/utilities/column-data-
 module.exports = function ( app ) {
   var companyUtilityRouter = express.Router();
 
-  companyUtilityRouter.use( sessionMiddleware('Session') );
+  companyUtilityRouter.use( sessionMiddleware('Session', true, 'company') );
 
   companyUtilityRouter.post('/column-data', busboy(), columnDataHandler.parse);
   

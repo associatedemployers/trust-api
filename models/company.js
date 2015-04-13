@@ -64,7 +64,12 @@ var companySchema = new Schema({
 
   logins: [ loginSchema ],
 
-  automaticEmailNotifications: { type: Boolean, default: true },
+  notifications: {
+    toEmployees:       { type: Boolean, default: true },
+    summaryOfBenefits: { type: Boolean, default: true },
+    enrollmentReview:  { type: Boolean, default: false },
+    waiver:            { type: Boolean, default: true }
+  },
 
   // Relational
   medicalRates:      [{ type: mongoose.Schema.ObjectId, ref: 'MedicalRate' }],
@@ -88,7 +93,6 @@ var companySchema = new Schema({
   legacyLoa:               String,
   legacyContribution:      String,
   legacyNotes:             String,
-  legacyWebId:             String,
   legacyWebPassword:       String,
   legacyWebEmail:          String,
   legacyAffiliated:        String,
