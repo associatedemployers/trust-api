@@ -12,3 +12,7 @@ exports.fetchAll = function ( req, res, next ) {
     company: req.session.user._id
   }).apply(this, arguments);
 };
+
+exports.create = function ( req, res, next ) {
+
+};

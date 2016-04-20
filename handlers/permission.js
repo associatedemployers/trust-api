@@ -15,7 +15,7 @@ exports.fetchAll = function ( req, res, next ) {
       return respond.error.res( res, err, true );
     }
 
-    var permissionGroups = _.pluck(_.uniq(permissions, function ( permission ) {
+    var permissionGroups = _.map(_.uniq(permissions, function ( permission ) {
       return permission.group._id;
     }), 'group');
 

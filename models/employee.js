@@ -120,6 +120,7 @@ var employeeSchema = new Schema({
     vision:  [{ type: Schema.ObjectId, ref: 'VisionRate' }],
     life:    [{ type: Schema.ObjectId, ref: 'LifeRate' }]
   },
+
   // Plan Meta
   planOptions: {
     medical: { covers: String },
@@ -143,7 +144,7 @@ var employeeSchema = new Schema({
 
 /**
  * Records a login to the document
- * 
+ *
  * @return {Object} Promise
  */
 employeeSchema.methods.recordLogin = function ( ip ) {
