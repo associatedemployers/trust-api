@@ -4,6 +4,8 @@
   "description": "Trust API Server",
   "main": "index.js",
   "scripts": {
+    "start": "environment=dev node index.js",
+    "import": "NEVERFETCH=true node utility.js --import",
     "test": "environment=test mocha \"tests/**/*.js\" --reporter spec",
     "test-acceptance": "environment=test mocha \"tests/acceptance/**/*.js\" --reporter spec",
     "test-unit": "environment=test mocha \"tests/unit/**/*.js\" --reporter spec"
