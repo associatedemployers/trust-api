@@ -9,7 +9,7 @@ var createModel = require('./helpers/create-model');
 
 var permissionSchema = new Schema({
   name:  String, // Semantic
-  type:  String, // HTTP Verb
+  type:  String  // HTTP Verb
 }, { _id: false });
 
 var permissionGroupSchema = new Schema({
@@ -18,7 +18,7 @@ var permissionGroupSchema = new Schema({
   type:        String,
   permissions: [ permissionSchema ],
 
-  time_stamp: { type: Date, default: Date.now, index: true }
+  'time_stamp': { type: Date, default: Date.now, index: true }
 });
 
 module.exports = createModel('PermissionGroup', permissionGroupSchema);

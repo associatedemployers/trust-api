@@ -7,7 +7,7 @@ var winston   = require('winston').loggers.get('default'),
 var UserPermission  = require('../models/user-permission'),
     PermissionGroup = require('../models/permission-group');
 
-exports.fetchAll = function ( req, res, next ) {
+exports.fetchAll = function ( req, res ) {
   var user = req.session.user;
 
   UserPermission.populate(user.permissions, { path: 'group' }, function ( err, permissions ) {
@@ -36,10 +36,10 @@ exports.fetchAll = function ( req, res, next ) {
   });
 };
 
-exports.create = function ( req, res, next ) {
+exports.create = function ( req, res ) {
   var payload = req.body.permissionGroup;
 
-    if( !req.session.user.super ) {
+  if ( !req.session.user.super ) {
     return res.status(401).send('Users without "super" status are not allowed to create permissions');
   }
 

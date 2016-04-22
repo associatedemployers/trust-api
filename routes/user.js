@@ -11,7 +11,7 @@ module.exports = function ( app ) {
       userUtilityRouter = express.Router();
 
   userRouter.use( sessionMiddleware('Session', true) );
-  userRouter.use( authorizationMiddleware({ allow: 'admin' }) );
+  userRouter.use( authorizationMiddleware({ allow: 'admin', authorizeMethods: [ 'post', 'put', 'delete' ] }) );
 
   userRouter.get('/', userHandler.fetchAll);
   userRouter.get('/:id', userHandler.fetchByID);

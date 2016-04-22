@@ -9,14 +9,20 @@ var UserPermission  = require('../models/user-permission'),
     ResourceMixin  = require('../lib/mixins/resource-handler'),
     PermissionGroup = require('../models/permission-group');
 
+function _hasMatchingPermission ( available, requested ) {
+  return !!_.find(available, permission => {
+    return permission.group._id.toString() === requested.group.toString() && permission.type === requested.type;
+  });
+}
+
 exports.fetchAll = ResourceMixin.getAll('UserPermission');
 exports.fetchById = ResourceMixin.getById('UserPermission');
 
-exports.create = function ( req, res, next ) {
+exports.create = function ( req, res ) {
   var payload = req.body.userPermission,
       availablePermissions = req.session.user.permissions;
 
-  if( !payload ) {
+  if ( !payload ) {
     return respond.error.res(res, 'Provide a payload with your request, prefixed with the type');
   }
 
@@ -57,13 +63,13 @@ exports.create = function ( req, res, next ) {
 
         res.status(201).send({
           userPermission: record
-        });        
+        });
       });
     });
   });
 };
 
-exports.update = function ( req, res, next ) {
+exports.update = function ( req, res ) {
   var id = req.params.id,
       payload = req.body.userPermission,
       availablePermissions = req.session.user.permissions;
@@ -109,9 +115,3 @@ exports.update = function ( req, res, next ) {
     });
   });
 };
-
-function _hasMatchingPermission ( available, requested ) {
-  return !!_.find(available, function ( permission ) {
-    return ( permission.group._id.toString() === requested.group.toString() && permission.type === requested.type );
-  });
-}
