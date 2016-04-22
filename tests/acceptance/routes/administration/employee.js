@@ -3,10 +3,6 @@ var cwd = process.cwd();
 
 var chai    = require('chai'),
     expect  = chai.expect,
-    moment  = require('moment'),
-    _       = require('lodash'),
-    chalk   = require('chalk'),
-    winston = require('winston'),
     Promise = require('bluebird'); // jshint ignore:line
 
 var plugins = [
@@ -30,7 +26,7 @@ var app            = require(cwd + '/app').init( require('express')() ),
 describe('Route :: Employees', function () {
 
   describe('Endpoints', function () {
-    var _token, _perms, _user, _testEmployee;
+    var _token, _testEmployee;
 
     /* Test support */
     before(function ( done ) {
@@ -40,48 +36,39 @@ describe('Route :: Employees', function () {
         name: 'Users',
         endpoints: [ '/employees/', '/employees/:id/' ],
         type: 'resource',
-        permissions: [
-          {
-            name: 'Read',
-            type: 'get'
-          },
-          {
-            name: 'Create',
-            type: 'post'
-          },
-          {
-            name: 'Update',
-            type: 'put'
-          },
-          {
-            name: 'Delete',
-            type: 'delete'
-          }
-        ]
+        permissions: [{
+          name: 'Read',
+          type: 'get'
+        }, {
+          name: 'Create',
+          type: 'post'
+        }, {
+          name: 'Update',
+          type: 'put'
+        }, {
+          name: 'Delete',
+          type: 'delete'
+        }]
       }];
 
-      PermissionGroup.create(permissionArray, function ( err, firstPerm ) {
-        if( err ) {
-          throw err;
+      PermissionGroup.create(permissionArray, function ( err, perms ) {
+        if ( err ) {
+          return done(err);
         }
 
         var userId = mongoose.Types.ObjectId();
 
-        var userPerm = firstPerm.permissions.map(function ( p ) {
-          p       = p.toObject();
-          p.group = firstPerm._id;
-          p.user  = userId;
-          return p;
+        var userPerm = perms[0].permissions.map(p => {
+          var _p = p.toObject();
+          _p.group = perms[0]._id;
+          _p.user = userId;
+          return _p;
         });
 
-        UserPermission.create(userPerm, function ( err ) {
-          if( err ) {
-            throw err;
+        UserPermission.create(userPerm, function ( err, userPerms ) {
+          if ( err ) {
+            return done(err);
           }
-
-          var args = Array.prototype.slice.call( arguments, 1 );
-
-          _perms = args;
 
           var user = new User({
             type: 'admin',
@@ -89,17 +76,13 @@ describe('Route :: Employees', function () {
               email: 'mocha@test.js',
               password: 'latte'
             },
-            permissions: args.map(function ( p ) {
-              return p._id.toString();
-            })
+            permissions: userPerms.map(p => p._id.toString())
           });
 
           user.save(function ( err, user ) {
-            if( err ) {
-              throw err;
+            if ( err ) {
+              return done(err);
             }
-
-            _user = user;
 
             session.create( user._id, {}, 'Session' ).then(function ( userSession ) {
               _token = userSession.publicKey;
@@ -127,7 +110,9 @@ describe('Route :: Employees', function () {
         });
 
         testEmployee.save(function ( err, emp ) {
-          if( err ) throw err;
+          if ( err ) {
+            return done(err);
+          }
 
           _testEmployee = emp;
           done();
@@ -182,12 +167,16 @@ describe('Route :: Employees', function () {
 
           it('should return a valid [updated | previous] snapshot of document', function ( done ) {
             Employee.findById(_testEmployee._id, function ( err, _dbRecord ) {
-              if( err ) throw err;
+              if ( err ) {
+                return done(err);
+              }
 
               _dbRecord.waived = true;
 
               _dbRecord.save(function ( err, _newRecord ) {
-                if( err ) throw err;
+                if ( err ) {
+                  return done(err);
+                }
 
                 chai.request(app)
                   .get('/api/employees/' + _newRecord._id.toString() + '?snapshot=' + _newRecord.historyEvents[0].toString())

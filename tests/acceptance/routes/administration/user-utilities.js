@@ -3,10 +3,6 @@ var cwd = process.cwd();
 
 var chai    = require('chai'),
     expect  = chai.expect,
-    moment  = require('moment'),
-    _       = require('lodash'),
-    chalk   = require('chalk'),
-    winston = require('winston'),
     Promise = require('bluebird'); // jshint ignore:line
 
 var plugins = [
@@ -30,7 +26,7 @@ var app            = require(cwd + '/app').init( require('express')() ),
 describe('Route :: User Utilities', function () {
 
   describe('Endpoints', function () {
-    var _token, _perms, _user, _testId;
+    var _user, _testId;
 
     /* Test support */
     before(function ( done ) {
@@ -40,76 +36,53 @@ describe('Route :: User Utilities', function () {
         name: 'Users',
         endpoints: [ '/users/', '/users/:id/' ],
         type: 'resource',
-        permissions: [
-          {
-            name: 'Read',
-            type: 'get'
-          },
-          {
-            name: 'Create',
-            type: 'post'
-          },
-          {
-            name: 'Update',
-            type: 'put'
-          },
-          {
-            name: 'Delete',
-            type: 'delete'
-          }
-        ]
+        permissions: [{
+          name: 'Read',
+          type: 'get'
+        }, {
+          name: 'Create',
+          type: 'post'
+        }, {
+          name: 'Update',
+          type: 'put'
+        }, {
+          name: 'Delete',
+          type: 'delete'
+        }]
       }];
 
-      PermissionGroup.create(permissionArray, function ( err, firstPerm ) {
-        if( err ) {
-          throw err;
-        }
-
+      PermissionGroup.create(permissionArray).then(perms => {
         var userId = mongoose.Types.ObjectId();
         _testId = userId;
 
-        var userPerm = firstPerm.permissions.map(function ( p ) {
-          p       = p.toObject();
-          p.group = firstPerm._id;
-          p.user  = userId;
-          return p;
+        var userPerm = perms[0].permissions.map(p => {
+          var _p = p.toObject();
+          _p.group = perms[0]._id;
+          _p.user  = userId;
+          return _p;
         });
 
-        UserPermission.create(userPerm, function ( err ) {
-          if( err ) {
-            throw err;
-          }
-
-          var args = Array.prototype.slice.call(arguments, 0);
-          args.shift();
-
-          _perms = args;
-
+        return UserPermission.create(userPerm).then(userPerms => {
           var user = new User({
             _id: userId,
             type: 'admin',
             login: {
               email: 'mocha@test.js'
             },
-            permissions: args.map(function ( p ) {
+            permissions: userPerms.map(p => {
               return p._id.toString();
             })
           });
 
-          user.save(function ( err, user ) {
-            if( err ) {
-              throw err;
-            }
-
-            _user = user;
-
-            session.create( user._id, {}, 'Session' ).then(function ( userSession ) {
-              _token = userSession.publicKey;
-              done();
-            });
-          });
-        });
-      });
+          return user.save();
+        })
+        .then(user => {
+          _user = user;
+          return session.create(user._id, {}, 'Session');
+        })
+        .then(() => done());
+      })
+      .catch(done);
     });
 
     after(function ( done ) {
@@ -119,9 +92,7 @@ describe('Route :: User Utilities', function () {
     /* ./ Test support */
 
     describe('user/verify', function () {
-
       describe('GET', function () {
-
         it('should return 400 for invalid id', function ( done ) {
           chai.request(app)
             .get('/api/user/verify/123')
@@ -134,20 +105,24 @@ describe('Route :: User Utilities', function () {
 
         it('should return 404 for not found, and already verified ids', function ( done ) {
           User.update({ _id: _testId }, { $set: { verified: true } }).exec(function ( err ) {
-            if( err ) throw err;
+            if ( err ) {
+              return done(err);
+            }
 
             chai.request(app)
               .get('/api/user/verify/' + mongoose.Types.ObjectId())
               .then(function ( res ) {
                 expect(res).to.have.status(404);
-                
+
                 return chai.request(app).get('/api/user/verify/' + _testId);
               })
               .then(function ( res ) {
                 expect(res).to.have.status(404);
 
-                User.findByIdAndUpdate(_testId, { $set: { verified: false } }, function ( err , n ) {
-                  if( err ) throw err;
+                User.findByIdAndUpdate(_testId, { $set: { verified: false } }, function ( err ) {
+                  if ( err ) {
+                    return done(err);
+                  }
 
                   done();
                 });
@@ -170,20 +145,24 @@ describe('Route :: User Utilities', function () {
 
         it('should return 404 for not found, and already verified ids', function ( done ) {
           User.update({ _id: _testId }, { $set: { verified: true } }).exec(function ( err ) {
-            if( err ) throw err;
+            if ( err ) {
+              return done(err);
+            }
 
             chai.request(app)
               .post('/api/user/verify/' + mongoose.Types.ObjectId())
               .then(function ( res ) {
                 expect(res).to.have.status(404);
-                
+
                 return chai.request(app).post('/api/user/verify/' + _testId);
               })
               .then(function ( res ) {
                 expect(res).to.have.status(404);
 
                 User.update({ _id: _testId }, { $set: { verified: false } }).exec(function ( err ) {
-                  if( err ) throw err;
+                  if ( err ) {
+                    return done(err);
+                  }
 
                   done();
                 });
@@ -214,7 +193,9 @@ describe('Route :: User Utilities', function () {
               expect(res).to.have.status(200);
 
               User.findById(_testId, function ( err, doc ) {
-                if ( err ) throw err;
+                if ( err ) {
+                  return done(err);
+                }
 
                 expect(doc.login.password).to.exist;
                 expect(bcp.compareSync(pass, doc.login.password)).to.equal(true); // See if it's encrypted.

@@ -4,10 +4,6 @@ var cwd = process.cwd();
 var chai    = require('chai'),
     expect  = chai.expect,
     moment  = require('moment'),
-    _       = require('lodash'),
-    chalk   = require('chalk'),
-    winston = require('winston'),
-    moment  = require('moment'),
     Promise = require('bluebird'); // jshint ignore:line
 
 var plugins = [
@@ -22,19 +18,17 @@ plugins.map(function ( plugin ) {
 chai.request.addPromises(Promise);
 
 var app          = require(cwd + '/app').init( require('express')() ),
-    session      = require(cwd + '/lib/security/session'),
     mongoose     = require('mongoose'),
     Employee     = require(cwd + '/models/employee'),
     Company      = require(cwd + '/models/company'),
     Verification = require(cwd + '/models/verification'),
     tokenModule  = require(cwd + '/lib/security/token');
 
-var dataSignature = ( process.env.environment === 'test' ) ? '12345678123456789' : require(cwd + '/config/keys').dataSignature,
+var dataSignature = process.env.environment === 'test' ? '12345678123456789' : require(cwd + '/config/keys').dataSignature,
     encryptor     = require('simple-encryptor')(dataSignature);
 
 describe('Employee Route :: Login', function () {
-
-  var _testEmployees, _company;
+  var _testEmployees;
 
   /* Test support */
   before(function ( done ) {
@@ -47,60 +41,47 @@ describe('Employee Route :: Login', function () {
 
     company.employees = company.employees.map(mongoose.Types.ObjectId);
 
-    company.save(function ( err, companyDocument ) {
-      if ( err ) throw err;
-
-      _company = companyDocument;
-
-      var employees = [
-        {
-          _id:      company.employees[ 0 ],
-          company:  company._id,
-          ssn:      encryptor.encrypt(222111222),
-          enrolled: true,
-          name: {
-            first: 'Test',
-            last:  'Person'
-          },
-          logins: [
-            {
-              ip: '127.0.0.1',
-              time_stamp: Date.now()
-            }
-          ]
+    company.save().then(() => {
+      var employees = [{
+        _id:      company.employees[ 0 ],
+        company:  company._id,
+        ssn:      encryptor.encrypt(222111222),
+        enrolled: true,
+        name: {
+          first: 'Test',
+          last:  'Person'
         },
-        {
-          _id:      company.employees[ 1 ],
-          company:  company._id,
-          memberId: 943000000,
-          ssn:      encryptor.encrypt(222111223),
-          enrolled: true,
-          name: {
-            first: 'Foo',
-            last:  'Bar'
-          }
-        },
-        {
-          _id:      company.employees[ 2 ],
-          company:  company._id,
-          ssn:      '123',
-          ssnDc:    222111224,
-          enrolled: false,
-          name: {
-            first: 'Foo',
-            last:  'Bar'
-          }
+        logins: [{
+          ip: '127.0.0.1',
+          'time_stamp': Date.now()
+        }]
+      }, {
+        _id:      company.employees[ 1 ],
+        company:  company._id,
+        memberId: 943000000,
+        ssn:      encryptor.encrypt(222111223),
+        enrolled: true,
+        name: {
+          first: 'Foo',
+          last:  'Bar'
         }
-      ];
+      }, {
+        _id:      company.employees[ 2 ],
+        company:  company._id,
+        ssn:      '123',
+        ssnDc:    222111224,
+        enrolled: false,
+        name: {
+          first: 'Foo',
+          last:  'Bar'
+        }
+      }];
 
-      Employee.create(employees, function ( err ) {
-        if ( err ) throw err;
-
-        _testEmployees = Array.prototype.slice.call( arguments, 1 );
-
-        done();
-      });
-    });
+      return Employee.create(employees);
+    }).then(employees => {
+      _testEmployees = employees;
+      done();
+    }).catch(done);
   });
 
   after(function ( done ) {
@@ -237,7 +218,7 @@ describe('Employee Route :: Login', function () {
       chai.request(app)
         .post('/client-api/employee/login/verify')
         .send({
-          token:    "ABCDEFG123456789",
+          token:    'ABCDEFG123456789',
           memberId: 943123123
         })
         .then(function ( res ) {

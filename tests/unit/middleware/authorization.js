@@ -3,10 +3,7 @@ var cwd = process.cwd();
 
 var chai    = require('chai'),
     expect  = chai.expect,
-    moment  = require('moment'),
     _       = require('lodash'),
-    chalk   = require('chalk'),
-    winston = require('winston'),
     Promise = require('bluebird'); // jshint ignore:line
 
 var plugins = [
@@ -44,34 +41,23 @@ describe('Route Middleware :: Authorization', function () {
             name: 'Protected resource',
             endpoints: [ '/protected-resource', '/protected-resource/:id', '/protected-resource/:id/test' ],
             type: 'resource',
-            permissions: [
-              {
-                name: 'View',
-                type: 'get'
-              },
-              {
-                name: 'Update',
-                type: 'put'
-              }
-            ]
+            permissions: [{
+              name: 'View',
+              type: 'get'
+            }, {
+              name: 'Update',
+              type: 'put'
+            }]
           });
 
-      permission.save(function ( err, perm ) {
-        if( err ) {
-          throw err;
-        }
-
-        var userPerms = perm.permissions.toObject(),
+      permission.save().then(perm => {
+        var userPerms = perm.toObject().permissions,
             userId    = mongoose.Types.ObjectId();
 
         userPerms[0].group = userPerms[1].group = perm._id;
         userPerms[0].user  = userPerms[1].user  = userId;
 
-        UserPermission.create(userPerms, function ( err, firstPerm, secondPerm ) {
-          if( err ) {
-            throw err;
-          }
-
+        return UserPermission.create(userPerms).then(perms => {
           var user = new User({
             _id: userId,
             type: 'admin',
@@ -79,12 +65,14 @@ describe('Route Middleware :: Authorization', function () {
               email: 'mocha@test.js',
               password: 'latte'
             },
-            permissions: [ firstPerm._id, secondPerm._id ]
+            permissions: _.map(perms, '_id')
           });
 
-          user.save( done );
+          return user.save();
         });
-      });
+      })
+      .then(() => done())
+      .catch(done);
     });
 
     after(function ( done ) {
@@ -239,8 +227,6 @@ describe('Route Middleware :: Authorization', function () {
     });
 
     it('should work with mounted routers', function ( done ) {
-      var router = express.Router();
-
       _router.use( sessionMiddleware() );
       _router.use( authorizationMiddleware() );
       _router.get('/', function ( req ) {
@@ -315,11 +301,11 @@ describe('Route Middleware :: Authorization', function () {
                 .set('X-API-Token', _token)
                 .then(function ( res ) {
                   expect(res).to.have.status(200);
-                  
+
                   chai.request(_app)
                     .get('/api/protected-resource/545a5a2822437826c0e58a59/test/test2')
                     .set('X-API-Token', _token)
-                    .then(function ( res ) {              
+                    .then(function ( res ) {
                       // Status Code 401
                       expect(res).to.have.status(401);
                       // Relevant Error Message

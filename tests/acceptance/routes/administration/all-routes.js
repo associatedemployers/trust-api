@@ -1,55 +1,37 @@
 /* jshint expr:true */
 var allTypes = [ 'getone', 'get', 'post', 'put', 'delete' ];
-var routes = [
-  {
-    name: 'Employees'
-  },
-  {
-    name: 'Users'
-  },
-  {
-    name: 'Companies'
-  },
-  {
-    name: 'Dependents'
-  },
-  {
-    name: 'Files'
-  },
-  {
-    name: 'History-Events'
-  },
-  {
-    name: 'company/locations'
-  },
-  {
-    name: 'Medical-Plans'
-  },
-  {
-    name: 'Medical-Rates'
-  },
-  {
-    name: 'Dental-Rates'
-  },
-  {
-    name: 'Vision-Rates'
-  },
-  {
-    name: 'Life-Rates'
-  },
-  {
-    name: 'Permissions'
-  }
-];
+var routes = [{
+  name: 'Employees'
+}, {
+  name: 'Users'
+}, {
+  name: 'Companies'
+}, {
+  name: 'Dependents'
+}, {
+  name: 'Files'
+}, {
+  name: 'History-Events'
+}, {
+  name: 'company/locations'
+}, {
+  name: 'Medical-Plans'
+}, {
+  name: 'Medical-Rates'
+}, {
+  name: 'Dental-Rates'
+}, {
+  name: 'Vision-Rates'
+}, {
+  name: 'Life-Rates'
+}, {
+  name: 'Permissions'
+}];
 
 var cwd = process.cwd();
 
 var chai    = require('chai'),
     expect  = chai.expect,
-    moment  = require('moment'),
-    _       = require('lodash'),
-    chalk   = require('chalk'),
-    winston = require('winston'),
     Promise = require('bluebird'); // jshint ignore:line
 
 var plugins = [
@@ -69,9 +51,17 @@ var app            = require(cwd + '/app').init( require('express')() ),
     mongoose       = require('mongoose'),
     UserPermission = require(cwd + '/models/user-permission');
 
-describe('Routes :: Existence & Security Check', function () {
-  var _token, _perms, _user;
+function createRequestForType ( type, name ) {
+  var endpoint = type === 'put' || type === 'delete' || type === 'getone' ? '/api/' + name + '/' + mongoose.Types.ObjectId() : '/api/' + name;
+  var _type = type === 'getone' ? 'get' : type;
 
+  return chai.request(app)[_type](endpoint).then(res => {
+    expect(res, _type.toUpperCase() + ' to ' + name).to.have.status(401);
+  });
+}
+
+
+describe('Routes :: Existence & Security Check', function () {
   /* Test support */
   before(function ( done ) {
     var PermissionGroup = require(cwd + '/models/permission-group');
@@ -83,50 +73,39 @@ describe('Routes :: Existence & Security Check', function () {
         return arr.concat(s, s + ':id/');
       }, []),
       type: 'resource',
-      permissions: [
-        {
-          name: 'Read',
-          type: 'get'
-        },
-        {
-          name: 'Create',
-          type: 'post'
-        },
-        {
-          name: 'Update',
-          type: 'put'
-        },
-        {
-          name: 'Delete',
-          type: 'delete'
-        },
-
-      ]
+      permissions: [{
+        name: 'Read',
+        type: 'get'
+      }, {
+        name: 'Create',
+        type: 'post'
+      }, {
+        name: 'Update',
+        type: 'put'
+      }, {
+        name: 'Delete',
+        type: 'delete'
+      }]
     }];
 
-    PermissionGroup.create(permissionArray, function ( err, firstPerm ) {
+    PermissionGroup.create(permissionArray, function ( err, perms ) {
       if( err ) {
-        throw err;
+        return done(err);
       }
 
       var userId = mongoose.Types.ObjectId();
 
-      var userPerm = firstPerm.permissions.map(function ( p ) {
-        p       = p.toObject();
-        p.group = firstPerm._id;
-        p.user  = userId;
-        return p;
+      var userPerm = perms[0].permissions.map(p => {
+        var _p = p.toObject();
+        _p.group = perms[0]._id;
+        _p.user = userId;
+        return _p;
       });
 
-      UserPermission.create(userPerm, function ( err ) {
+      UserPermission.create(userPerm, function ( err, userPerms ) {
         if( err ) {
-          throw err;
+          return done(err);
         }
-
-        var args = Array.prototype.slice.call(arguments, 0);
-        args.shift();
-
-        _perms = args;
 
         var user = new User({
           type: 'admin',
@@ -134,20 +113,15 @@ describe('Routes :: Existence & Security Check', function () {
             email: 'mocha@test.js',
             password: 'latte'
           },
-          permissions: args.map(function ( p ) {
-            return p._id.toString();
-          })
+          permissions: userPerms.map(p => p._id.toString())
         });
 
         user.save(function ( err, user ) {
           if( err ) {
-            throw err;
+            return done(err);
           }
 
-          _user = user;
-
-          session.create( user._id, {}, 'Session' ).then(function ( userSession ) {
-            _token = userSession.publicKey;
+          session.create( user._id, {}, 'Session' ).then(() => {
             done();
           });
         });
@@ -173,13 +147,3 @@ describe('Routes :: Existence & Security Check', function () {
     });
   });
 });
-
-function createRequestForType ( type, name ) {
-  var endpoint = ( type === 'put' || type === 'delete' || type === 'getone' ) ? '/api/' + name + '/' + mongoose.Types.ObjectId() : '/api/' + name;
-
-  type = ( type === 'getone' ) ? 'get' : type;
-
-  return chai.request(app)[type](endpoint).then(function ( res ) {
-    expect(res, type.toUpperCase() + ' to ' + name).to.have.status(401);
-  });
-}

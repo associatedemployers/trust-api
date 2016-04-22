@@ -3,11 +3,7 @@ var cwd = process.cwd();
 
 var chai    = require('chai'),
     expect  = chai.expect,
-    moment  = require('moment'),
     _       = require('lodash'),
-    chalk   = require('chalk'),
-    winston = require('winston'),
-    moment  = require('moment'),
     Promise = require('bluebird'); // jshint ignore:line
 
 var plugins = [
@@ -32,7 +28,7 @@ var dataSignature = '12345678123456789',
     encryptor     = require('simple-encryptor')(dataSignature);
 
 describe('Employee Route :: Files', function () {
-  var _testEmployee, _company, _auth;
+  var _testEmployee, _auth;
 
   var globSync       = require('glob').sync,
       fs             = require('fs-extra'),
@@ -51,47 +47,39 @@ describe('Employee Route :: Files', function () {
       employees: [ mongoose.Types.ObjectId() ]
     });
 
-    company.save(function ( err, companyDocument ) {
-      if ( err ) throw err;
-
-      _company = companyDocument;
-
-      var employees = [
-        {
-          _id:      company.employees[ 0 ],
-          company:  company._id,
-          ssn:      encryptor.encrypt(222111222),
-          memberId: 943121234,
-          enrolled: true,
-          name: {
-            first: 'Mr.',
-            last:  'T'
-          }
+    company.save().then(() => {
+      var employees = [{
+        _id:      company.employees[ 0 ],
+        company:  company._id,
+        ssn:      encryptor.encrypt(222111222),
+        memberId: 943121234,
+        enrolled: true,
+        name: {
+          first: 'Mr.',
+          last:  'T'
         }
-      ];
+      }];
 
-      Employee.create(employees, function ( err, e ) {
-        if ( err ) throw err;
-
+      return Employee.create(employees).then(e => {
         var sessionData = {
-          userId:   e._id.toString(),
-          memberId: e.memberId
+          userId:   e[0]._id.toString(),
+          memberId: e[0].memberId
         };
 
-        _testEmployee = e;
+        _testEmployee = e[0];
 
-        session.create(e._id, sessionData, 'Session', 'employee', 'Employee').then(function ( a ) {
-          _auth = a;
-          done();
-        });
+        return session.create(e[0]._id, sessionData, 'Session', 'employee', 'Employee');
+      }).then(a => {
+        _auth = a;
+        done();
       });
-    });
+    })
+    .catch(done);
   });
 
   after(function ( done ) {
     var mongoose = require('mongoose');
-
-    fs.remove(_fileDir, function () {
+    fs.remove(_fileDir, () => {
       mongoose.connection.db.dropDatabase(done);
     });
   });

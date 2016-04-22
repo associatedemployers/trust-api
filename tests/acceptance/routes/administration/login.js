@@ -37,6 +37,11 @@ describe('Route :: Login', function () {
           // Relevant error message
           expect(res.error.text).to.contain('email');
           done();
+        }).catch(res => {
+          expect(res).to.have.status(400);
+          // Relevant error message
+          expect(res.error.text).to.contain('email');
+          done();
         });
     });
 

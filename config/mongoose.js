@@ -8,24 +8,25 @@ var mongoose = require('mongoose'),
 
 var connection;
 
+mongoose.Promise = require('bluebird');
+
 exports.init = function ( db, address, singleton ) {
-  // Defaults
-  db      = ( process.env.environment === 'test' ) ? 'trusttest' : ( db ) ? db : 'trust';
-  address = address || 'localhost';
+  var _db = process.env.environment === 'test' ? 'trusttest' : db ? db : 'trust',
+      _address = address || 'localhost';
 
   if( !connection && !singleton ) {
     mongoose.connection.close();
 
-    winston.debug(chalk.dim('Connecting to', db, 'db...'));
+    winston.debug(chalk.dim('Connecting to', _db, 'db...'));
 
-    connection = mongoose.connect(address, db);
+    connection = mongoose.connect(_address, _db);
 
     return connection;
 
   } else if( singleton ) {
-    winston.debug(chalk.dim('Singleton connection to', db, 'db...'));
+    winston.debug(chalk.dim('Singleton connection to', _db, 'db...'));
 
-    return mongoose.createConnection(address + '/' + db);
+    return mongoose.createConnection(_address + '/' + _db);
   } else {
     winston.debug(chalk.dim('Returning existing connection'));
 

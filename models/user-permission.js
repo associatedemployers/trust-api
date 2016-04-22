@@ -15,18 +15,16 @@ var permissionSchema = new Schema({
   name:      String,
   type:      String,
 
-  time_stamp: { type: Date, default: Date.now }
+  'time_stamp': { type: Date, default: Date.now }
 });
 
 permissionSchema.pre('save', function ( next ) {
-  var self = this;
-
-  PermissionGroup.findById(self.group, function ( err, group ) {
-    if( err ) return next( err );
-
-    self.groupName = group.name;
-    next.call( self );
-  });
+  PermissionGroup.findById(this.group).exec()
+  .then(group => {
+    this.groupName = group.name;
+    next();
+  })
+  .catch(next);
 });
 
 module.exports = createModel('UserPermission', permissionSchema);

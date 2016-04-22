@@ -39,38 +39,35 @@ describe('Route :: Permissions', function () {
         name: 'Protected resource',
         endpoints: [ '/protected-resource' ],
         type: 'resource',
-        permissions: [
-          {
-            name: 'View',
-            type: 'get'
-          },
-          {
-            name: 'Update',
-            type: 'put'
-          }
-        ]
+        permissions: [{
+          name: 'View',
+          type: 'get'
+        }, {
+          name: 'Update',
+          type: 'put'
+        }]
       }];
 
       permissionArray.push(permissionArray[0]);
       permissionArray[1].endpoints = [ '/other-protected-resource' ];
 
-      PermissionGroup.create(permissionArray, function ( err, firstPerm, secondPerm ) {
-        if( err ) {
-          throw err;
+      PermissionGroup.create(permissionArray, function ( err, perms ) {
+        if ( err ) {
+          return done(err);
         }
 
-        var userPerm = firstPerm.permissions.toObject()[0],
+        var userPerm = perms[0].permissions.toObject()[0],
             userId   = mongoose.Types.ObjectId();
 
-        userPerm.group = firstPerm._id;
+        userPerm.group = perms[0]._id;
         userPerm.user  = userId;
 
-        UserPermission.create(userPerm, function ( err, firstUserPerm ) {
-          if( err ) {
-            throw err;
+        UserPermission.create(userPerm, function ( err, userPerms ) {
+          if ( err ) {
+            return done(err);
           }
 
-          _perms = [ firstPerm, secondPerm ];
+          _perms = perms;
 
           var user = new User({
             type: 'admin',
@@ -78,7 +75,7 @@ describe('Route :: Permissions', function () {
               email: 'mocha@test.js',
               password: 'latte'
             },
-            permissions: [ firstUserPerm._id.toString() ]
+            permissions: userPerms
           });
 
           user.save(function ( err, user ) {
@@ -89,9 +86,7 @@ describe('Route :: Permissions', function () {
             session.create( user._id, {}, 'Session' ).then(function ( userSession ) {
               _token = userSession.publicKey;
               done();
-            }).catch(function ( err ) {
-              return respond.error.res( res, err, true );
-            });
+            }).catch(done);
           });
         });
       });
@@ -111,7 +106,6 @@ describe('Route :: Permissions', function () {
           expect(res).to.have.status(200).and.to.be.json;
           expect(res.body.permissionGroup).to.exist.and.to.be.an('array').and.to.have.length(1);
           expect(res.body.permissionGroup[0]._id).to.equal(_perms[0]._id.toString());
-
           done();
         });
     });

@@ -51,7 +51,7 @@ exports.login = function ( req, res, next ) {
       })
       .then(_respondWithAuthorization.bind(res));
     });
-  }).onReject( handleError );
+  }).catch( handleError );
 };
 
 /**

@@ -7,9 +7,9 @@ var mongoose = require('mongoose'),
 
 var createModel = require('./helpers/create-model');
 
-var ticker     = require(process.cwd() + '/lib/ticker/ticker'),
-    cryptify   = require('mongoose-cryptify'),
-    searchable = require('./plugins/searchable');
+var ticker = require(process.cwd() + '/lib/ticker/ticker'),
+    cryptify = require('mongoose-cryptify'),
+    winston = require('winston');
 
 var userSchema = new Schema({
   name: {
@@ -18,7 +18,7 @@ var userSchema = new Schema({
   },
 
   login: {
-    email:    { type: String, unique: true },
+    email:    String,
     password: String
   },
 
@@ -30,15 +30,14 @@ var userSchema = new Schema({
 
   permissions: [{ type: Schema.ObjectId, ref: 'UserPermission' }],
 
-  time_stamp: { type: Date, default: Date.now, index: true }
+  'time_stamp': { type: Date, default: Date.now, index: true }
 });
 
-var Mailman = require('../lib/controllers/mailman'),
-    crypto  = require('crypto');
+var Mailman = require('../lib/controllers/mailman');
 
 // Hold isNew status for post hooks
 userSchema.pre('save', function ( next ) {
-  this.isNew_post = this.verified = this.isNew;
+  this.wasNew = this.verified = this.isNew;
   next();
 });
 
@@ -47,7 +46,7 @@ userSchema.pre('save', function ( next ) {
 // Sends user an email with id link
 // from email so that we can set their password
 userSchema.post('save', function ( doc ) {
-  if( !this.isNew_post || !this.login.email ) {
+  if( !this.wasNew || !this.login.email ) {
     return;
   }
 

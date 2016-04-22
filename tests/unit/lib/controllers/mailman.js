@@ -2,12 +2,9 @@ var cwd = process.cwd();
 
 var chai        = require('chai'),
     chaiPromise = require('chai-as-promised'),
-    expect      = chai.expect,
-    _           = require('lodash'),
-    async       = require('async'),
-    chalk       = require('chalk');
+    expect      = chai.expect;
 
-chai.use( chaiPromise );
+chai.use(chaiPromise);
 
 var Mailman = require(cwd + '/lib/controllers/mailman');
 
@@ -16,7 +13,7 @@ describe('Mailman', function () {
     expect(Mailman).to.be.a('function');
   });
 
-  (process.env.allow_test_sendmail === "true" ? it : it.skip)('should send an email', function ( done ) {
+  (process.env.allow_test_sendmail === 'true' ? it : it.skip)('should send an email', done => {
     this.timeout(60000);
 
     var postalWorker = new Mailman(),
@@ -27,13 +24,14 @@ describe('Mailman', function () {
     expect(promise).to.be.fulfilled.and.notify(done);
   });
 
-  it('should be utilize and render .hbs partials', function ( done ) {
+  it('should be utilize and render .hbs partials', done => {
     var postalWorker = new Mailman(),
         promise = postalWorker.__render('test-partial', {});
 
-    expect(promise).to.be.fulfilled.then(function ( rendered ) {
+    promise.then(rendered => {
       expect(rendered.text).to.contain('Hello :)');
       done();
-    });
+    })
+    .catch(done);
   });
 });

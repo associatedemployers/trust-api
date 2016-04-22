@@ -3,10 +3,7 @@ var cwd = process.cwd();
 
 var chai    = require('chai'),
     expect  = chai.expect,
-    moment  = require('moment'),
     _       = require('lodash'),
-    chalk   = require('chalk'),
-    winston = require('winston'),
     Promise = require('bluebird'); // jshint ignore:line
 
 var plugins = [
@@ -39,38 +36,34 @@ describe('Route :: User-Permissions', function () {
         name: 'User Permissions',
         endpoints: [ '/user-permission/', '/user-permissions/', '/user-permissions/:id/' ],
         type: 'resource',
-        permissions: [
-          {
-            name: 'Create',
-            type: 'post'
-          },
-          {
-            name: 'Update',
-            type: 'put'
-          }
-        ]
+        permissions: [{
+          name: 'Create',
+          type: 'post'
+        }, {
+          name: 'Update',
+          type: 'put'
+        }]
       }];
 
-      PermissionGroup.create(permissionArray, function ( err, firstPerm ) {
-        if( err ) {
-          throw err;
+      PermissionGroup.create(permissionArray, function ( err, perms ) {
+        if ( err ) {
+          return done(err);
         }
 
-        var userPerm = [ firstPerm.permissions.toObject()[0], firstPerm.permissions.toObject()[1] ],
-            userId   = mongoose.Types.ObjectId();
-
-        userPerm = userPerm.map(function ( p ) {
-          p.group = firstPerm._id;
-          p.user = userId;
-          return p;
+        var userId   = mongoose.Types.ObjectId();
+        var userPerm = perms[0].permissions.map(p => {
+          var _p = p.toObject();
+          _p.group = perms[0]._id;
+          _p.user = userId;
+          return _p;
         });
 
-        UserPermission.create(userPerm, function ( err, firstUserPerm, secondUserPerm ) {
-          if( err ) {
-            throw err;
+        UserPermission.create(userPerm, function ( err, userPerms ) {
+          if ( err ) {
+            return done(err);
           }
 
-          _perms = [ firstPerm ];
+          _perms = perms;
 
           var user = new User({
             type: 'admin',
@@ -78,12 +71,12 @@ describe('Route :: User-Permissions', function () {
               email: 'mocha@test.js',
               password: 'latte'
             },
-            permissions: [ firstUserPerm._id.toString(), secondUserPerm._id.toString() ]
+            permissions: _.map(userPerms, '_id')
           });
 
           user.save(function ( err, user ) {
-            if( err ) {
-              throw err;
+            if ( err ) {
+              return done(err);
             }
 
             _user = user;
@@ -91,9 +84,7 @@ describe('Route :: User-Permissions', function () {
             session.create( user._id, {}, 'Session' ).then(function ( userSession ) {
               _token = userSession.publicKey;
               done();
-            }).catch(function ( err ) {
-              return respond.error.res( res, err, true );
-            });
+            }).catch(done);
           });
         });
       });
@@ -184,7 +175,7 @@ describe('Route :: User-Permissions', function () {
             name: 'Create'
           }
         })
-        .then(function ( res ) {
+        .then(res => {
           expect(res).to.have.status(201).and.to.be.json;
 
           expect(res.body.userPermission)
@@ -226,7 +217,7 @@ describe('Route :: User-Permissions', function () {
                 group: _perms[0]._id,
                 user:  _user._id,
                 type:  'post',
-                name:  'test',
+                name:  'test'
               }
             })
             .then(function ( res ) {

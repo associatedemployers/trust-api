@@ -64,9 +64,9 @@ exports.login = function ( req, res, next ) {
             expiration:           verification.expiration
           });
         });
-      }).onReject( handleError );
+      }).catch( handleError );
     }
-  }).onReject( handleError );
+  }).catch( handleError );
 };
 
 exports.verify = function ( req, res, next ) {
@@ -117,7 +117,7 @@ exports.verify = function ( req, res, next ) {
         .catch( handleError );
       });
     });
-  }).onReject( handleError );
+  }).catch( handleError );
 };
 
 /**
